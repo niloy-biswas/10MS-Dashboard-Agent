@@ -36,19 +36,22 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
     >
       {/* Bubble */}
       {isUser ? (
-        /* ── User: clean light pill ── */
-        <div className="max-w-[72%] px-4 py-2.5 rounded-[20px] rounded-br-md bg-white/90 text-[#0d0d14] text-sm leading-relaxed shadow-sm">
+        /* ── User: same glass, right-aligned ── */
+        <div
+          className="max-w-[72%] px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed text-[#dde3f0]
+            bg-white/[0.07] backdrop-blur-md
+            border border-white/[0.09]"
+        >
           <span className={message.isStreaming ? "streaming-cursor" : ""}>
             {message.content}
           </span>
         </div>
       ) : (
-        /* ── Assistant: dark glass card ── */
+        /* ── Assistant: glass card, full width ── */
         <div
-          className={`w-full rounded-2xl rounded-bl-md px-5 py-4 text-sm leading-relaxed text-foreground/90
-            bg-white/[0.04] backdrop-blur-md
+          className={`w-full rounded-2xl rounded-bl-sm px-5 py-4 text-sm leading-relaxed text-[#dde3f0]
+            bg-white/[0.05] backdrop-blur-md
             border border-white/[0.08]
-            shadow-[0_4px_24px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]
             ${message.isStreaming ? "streaming-cursor" : ""}`}
         >
           {message.content.length === 0 && message.isStreaming ? (
@@ -64,7 +67,7 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
                     </div>
                   ),
                   thead: ({ children }) => (
-                    <thead className="bg-white/[0.06]">{children}</thead>
+                    <thead className="bg-white/[0.04]">{children}</thead>
                   ),
                   th: ({ children }) => (
                     <th className="border border-white/10 px-3 py-2 text-left font-semibold whitespace-nowrap text-foreground">

@@ -55,17 +55,35 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen overflow-hidden" style={{ background: "#080a0f" }}>
       {/* Sidebar */}
       <DashboardSidebar dashboard={dashboard} profile={profile} />
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative">
+
+        {/* Gradient background with ambient glows */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(160deg, #0d1120 0%, #090b14 45%, #080a0f 100%)",
+            }}
+          />
+          {/* Red ambient — top right */}
+          <div className="absolute -top-20 right-1/3 w-[500px] h-[400px] rounded-full bg-primary/[0.07] blur-[120px]" />
+          {/* Blue ambient — bottom left */}
+          <div className="absolute bottom-1/4 -left-10 w-[400px] h-[400px] rounded-full bg-[#4f8ef7]/[0.06] blur-[110px]" />
+          {/* Subtle center depth */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-[#1a1f3a]/30 blur-[80px]" />
+        </div>
+
         {/* Back nav + header */}
-        <div className="flex items-center border-b border-border/50 bg-card/60 backdrop-blur-sm">
+        <div className="relative z-10 flex items-center border-b border-white/[0.06] bg-black/20 backdrop-blur-md">
           <button
             onClick={() => router.push("/")}
-            className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors border-r border-border/40"
+            className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors border-r border-white/[0.06]"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -75,7 +93,7 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
           {messages.length > 0 && (
             <button
               onClick={handleClear}
-              className="h-14 px-4 text-xs text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors border-l border-border/40"
+              className="h-14 px-4 text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors border-l border-white/[0.06]"
             >
               Clear
             </button>
@@ -89,7 +107,7 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
+              className="overflow-hidden relative z-10"
             >
               <div className="flex items-center gap-2 px-6 py-2.5 bg-destructive/10 border-b border-destructive/20 text-xs text-destructive">
                 <AlertCircle className="h-3.5 w-3.5 shrink-0" />
@@ -100,14 +118,14 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
         </AnimatePresence>
 
         {/* Messages area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="relative z-10 flex-1 overflow-y-auto">
           {isEmpty ? (
             <EmptyState
               dashboardId={dashboard.dashboard_id}
               dashboardName={dashboard.dashboard_name}
             />
           ) : (
-            <div className="px-6 py-5 flex flex-col gap-4 max-w-3xl mx-auto w-full">
+            <div className="px-6 py-6 flex flex-col gap-5 max-w-3xl mx-auto w-full">
               <AnimatePresence initial={false}>
                 {messages.map((msg) => (
                   <ChatMessageBubble key={msg.id} message={msg} />
@@ -120,18 +138,22 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
 
         {/* Suggested prompts — only when empty */}
         {isEmpty && (
-          <SuggestedPrompts
-            dashboardName={dashboard.dashboard_name}
-            onSelect={handleSend}
-          />
+          <div className="relative z-10">
+            <SuggestedPrompts
+              dashboardName={dashboard.dashboard_name}
+              onSelect={handleSend}
+            />
+          </div>
         )}
 
         {/* Input */}
-        <ChatInput
-          onSend={handleSend}
-          isStreaming={isStreaming}
-          placeholder={`Ask a question about Dashboard ${dashboard.dashboard_id}…`}
-        />
+        <div className="relative z-10">
+          <ChatInput
+            onSend={handleSend}
+            isStreaming={isStreaming}
+            placeholder={`Ask a question about Dashboard ${dashboard.dashboard_id}…`}
+          />
+        </div>
       </div>
     </div>
   );
