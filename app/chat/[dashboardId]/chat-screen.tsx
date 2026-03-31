@@ -107,7 +107,7 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
               dashboardName={dashboard.dashboard_name}
             />
           ) : (
-            <div className="px-6 py-5 flex flex-col gap-5 max-w-3xl mx-auto w-full">
+            <div className="px-6 py-5 flex flex-col gap-4 max-w-3xl mx-auto w-full">
               <AnimatePresence initial={false}>
                 {messages.map((msg) => (
                   <ChatMessageBubble key={msg.id} message={msg} />
