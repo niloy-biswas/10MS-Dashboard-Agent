@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, LogIn, BarChart2, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { GoogleIcon } from "@/components/auth/google-icon";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,7 +14,35 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Read ?error= set by the OAuth callback without needing useSearchParams
+    const params = new URLSearchParams(window.location.search);
+    const urlError = params.get("error");
+    if (urlError) setError(decodeURIComponent(urlError));
+  }, []);
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setGoogleLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: { hd: "10minuteschool.com" },
+      },
+    });
+    if (error) {
+      const msg = error.message.toLowerCase().includes("provider")
+        ? "Google sign-in is not configured yet. Please contact your admin."
+        : error.message;
+      setError(msg);
+      setGoogleLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,6 +131,38 @@ export default function LoginPage() {
               <p className="text-sm text-muted-foreground mt-1.5">
                 Sign in to access your analytics workspace
               </p>
+            </motion.div>
+
+            {/* Google sign-in */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.18, duration: 0.4 }}
+              className="mb-5"
+            >
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading || loading}
+                className="w-full h-11 bg-card hover:bg-muted/60 active:bg-muted/80 disabled:opacity-50 disabled:cursor-not-allowed border border-border/60 hover:border-border text-foreground text-sm font-medium rounded-xl flex items-center justify-center gap-2.5 transition-all duration-200"
+              >
+                {googleLoading ? (
+                  <span className="h-4 w-4 rounded-full border-2 border-muted-foreground/30 border-t-foreground animate-spin" />
+                ) : (
+                  <>
+                    <GoogleIcon />
+                    Continue with Google
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center gap-3 mt-5">
+                <div className="flex-1 h-px bg-border/40" />
+                <span className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.12em]">
+                  or
+                </span>
+                <div className="flex-1 h-px bg-border/40" />
+              </div>
             </motion.div>
 
             {/* Error state */}
