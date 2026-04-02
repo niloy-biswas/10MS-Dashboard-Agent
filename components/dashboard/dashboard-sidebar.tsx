@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, BarChart2, Filter, Info, ExternalLink, Clock, Plus, MessageSquare } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { UserAvatar } from "@/components/auth/user-avatar";
 import type { Dashboard, Profile, ChatSession } from "@/lib/types";
 
 // ── Collapsible section ──────────────────────────────────
@@ -51,12 +52,9 @@ export function SidebarSection({ title, icon, children, defaultOpen = false }: S
 
 function ProfileCard({ profile }: { profile: Profile | null }) {
   if (!profile) return null;
-  const initials = profile.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
   return (
     <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-muted/30 border border-border/50">
-      <div className="shrink-0 h-8 w-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-xs font-bold text-primary">
-        {initials}
-      </div>
+      <UserAvatar name={profile.name} avatarUrl={profile.avatar_url} size="md" />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{profile.name}</p>
         <p className="text-xs text-muted-foreground truncate">{profile.role}</p>

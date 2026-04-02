@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { BarChart2, Sparkles } from "lucide-react";
 import { DashboardSelector } from "@/components/dashboard/dashboard-selector";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { UserAvatar } from "@/components/auth/user-avatar";
 import type { Dashboard, Profile } from "@/lib/types";
 
 interface SelectorScreenProps {
@@ -56,9 +57,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
                   <p className="text-xs font-medium text-foreground">{profile.name}</p>
                   <p className="text-[10px] text-muted-foreground">{profile.role}</p>
                 </div>
-                <div className="h-7 w-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[10px] font-bold text-primary">
-                  {profile.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
-                </div>
+                <UserAvatar name={profile.name} avatarUrl={profile.avatar_url} size="sm" />
                 <LogoutButton />
               </div>
             )}
