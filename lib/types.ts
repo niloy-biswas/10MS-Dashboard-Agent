@@ -52,7 +52,6 @@ export interface ChatPayload {
     role: string;
   } | null;
   message: string;
-  history: { role: string; content: string }[];
   context_tables?: {
     table_name: string;
     description: string;

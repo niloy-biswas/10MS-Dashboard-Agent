@@ -39,7 +39,6 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
         ? { id: profile.id, name: profile.name, email: profile.email, role: profile.role }
         : null,
       message: text,
-      history: [],
     });
   };
 
