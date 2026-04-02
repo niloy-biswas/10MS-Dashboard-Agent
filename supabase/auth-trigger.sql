@@ -7,14 +7,27 @@
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, name, email, role)
+  insert into public.profiles (id, name, email, role, avatar_url)
   values (
     new.id,
-    coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+    -- Google OAuth sends full_name; email/password signup sends name
+    coalesce(
+      new.raw_user_meta_data->>'full_name',
+      new.raw_user_meta_data->>'name',
+      split_part(new.email, '@', 1)
+    ),
     new.email,
-    'Analyst'
+    'Analyst',
+    -- Google OAuth sends avatar_url; fallback to picture (some providers)
+    coalesce(
+      new.raw_user_meta_data->>'avatar_url',
+      new.raw_user_meta_data->>'picture'
+    )
   )
-  on conflict (email) do nothing;
+  on conflict (email) do update
+    -- For returning users signing in via Google for the first time,
+    -- backfill avatar_url only if it isn't already set
+    set avatar_url = coalesce(profiles.avatar_url, excluded.avatar_url);
   return new;
 end;
 $$ language plpgsql security definer;
