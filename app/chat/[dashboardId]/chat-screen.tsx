@@ -22,7 +22,7 @@ interface ChatScreenProps {
 
 export function ChatScreen({ dashboard, profile, session, sessions, initialMessages }: ChatScreenProps) {
   const router = useRouter();
-  const { messages, isStreaming, error, sendMessage, clearMessages } = useChat(initialMessages);
+  const { messages, isStreaming, error, sendMessage } = useChat(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,15 +40,6 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
         : null,
       message: text,
     });
-  };
-
-  const handleClear = async () => {
-    await fetch("/api/chat/clear", {
-      method: "POST",
-      body: JSON.stringify({ sessionId: session.id }),
-      headers: { "Content-Type": "application/json" },
-    });
-    clearMessages();
   };
 
   const isEmpty = messages.length === 0;
@@ -88,14 +79,6 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
           <div className="flex-1">
             <ChatHeader dashboard={dashboard} sessionNumber={session.session_number} sessionTitle={session.title} />
           </div>
-          {messages.length > 0 && (
-            <button
-              onClick={handleClear}
-              className="h-14 px-4 text-xs text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors border-l border-white/[0.06]"
-            >
-              Clear
-            </button>
-          )}
         </div>
 
         {/* Error banner */}
