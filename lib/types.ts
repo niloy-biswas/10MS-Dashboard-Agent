@@ -30,7 +30,18 @@ export interface ChatMessage {
   isStreaming?: boolean;
 }
 
+export interface ChatSession {
+  id: string;
+  profile_id: string;
+  dashboard_id: string;
+  session_number: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ChatPayload {
+  session_id: string | null;
   dashboard_id: string;
   dashboard_number: string;
   dashboard_name: string;

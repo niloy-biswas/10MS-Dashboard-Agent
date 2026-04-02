@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Dashboard, Profile, ChatMessage } from "@/lib/types";
+import type { Dashboard, Profile, ChatMessage, ChatSession } from "@/lib/types";
 
 // Anon client for DB queries — all tables use permissive RLS (USING true)
 const supabase = createClient(
@@ -126,6 +126,133 @@ export async function clearChatHistory(dashboardId: string, profileId: string): 
   }
   return true;
 }
+
+// ── Chat Sessions ──────────────────────────────────────────
+
+export async function getChatSessions(
+  dashboardId: string,
+  profileId: string
+): Promise<ChatSession[]> {
+  const { data, error } = await supabase
+    .from("chat_sessions")
+    .select("*")
+    .eq("dashboard_id", dashboardId)
+    .eq("profile_id", profileId)
+    .order("session_number", { ascending: false });
+  if (error) return [];
+  return data as ChatSession[];
+}
+
+export async function getChatSessionByNumber(
+  dashboardId: string,
+  profileId: string,
+  sessionNumber: number
+): Promise<ChatSession | null> {
+  const { data, error } = await supabase
+    .from("chat_sessions")
+    .select("*")
+    .eq("dashboard_id", dashboardId)
+    .eq("profile_id", profileId)
+    .eq("session_number", sessionNumber)
+    .single();
+  if (error) return null;
+  return data as ChatSession;
+}
+
+export async function createChatSession(
+  dashboardId: string,
+  profileId: string
+): Promise<ChatSession | null> {
+  const { data: existing } = await supabase
+    .from("chat_sessions")
+    .select("session_number")
+    .eq("dashboard_id", dashboardId)
+    .eq("profile_id", profileId)
+    .order("session_number", { ascending: false })
+    .limit(1);
+
+  const nextNumber =
+    existing && existing.length > 0 ? existing[0].session_number + 1 : 1;
+
+  const { data, error } = await supabase
+    .from("chat_sessions")
+    .insert({ dashboard_id: dashboardId, profile_id: profileId, session_number: nextNumber, title: "New Chat" })
+    .select()
+    .single();
+
+  if (error) return null;
+  return data as ChatSession;
+}
+
+export async function getOrCreateLatestSession(
+  dashboardId: string,
+  profileId: string
+): Promise<ChatSession | null> {
+  const { data } = await supabase
+    .from("chat_sessions")
+    .select("*")
+    .eq("dashboard_id", dashboardId)
+    .eq("profile_id", profileId)
+    .order("session_number", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (data) return data as ChatSession;
+  return createChatSession(dashboardId, profileId);
+}
+
+export async function getChatHistoryBySession(sessionId: string): Promise<ChatMessage[]> {
+  const { data, error } = await supabase
+    .from("chat_messages")
+    .select("*")
+    .eq("session_id", sessionId)
+    .order("created_at", { ascending: true });
+
+  if (error) return [];
+  return data.map((row: any) => ({
+    id: row.id,
+    role: row.role as "user" | "assistant",
+    content: row.content,
+    metadata: row.metadata,
+    createdAt: row.created_at,
+  }));
+}
+
+export async function saveChatMessageToSession(
+  sessionId: string,
+  dashboardId: string,
+  profileId: string,
+  role: "user" | "assistant",
+  content: string,
+  metadata?: Record<string, any>
+): Promise<boolean> {
+  const { error } = await supabase.from("chat_messages").insert({
+    session_id: sessionId,
+    dashboard_id: dashboardId,
+    profile_id: profileId,
+    role,
+    content,
+    metadata,
+  });
+  return !error;
+}
+
+export async function updateSessionTitle(sessionId: string, title: string): Promise<void> {
+  await supabase
+    .from("chat_sessions")
+    .update({ title: title.slice(0, 60), updated_at: new Date().toISOString() })
+    .eq("id", sessionId);
+}
+
+export async function clearSessionMessages(sessionId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from("chat_messages")
+    .delete()
+    .eq("session_id", sessionId);
+  return !error;
+}
+
+// ── Dashboard Tables ───────────────────────────────────────
 
 export async function getDashboardTables(dashboardId: string) {
   const { data, error } = await supabase

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { saveChatMessage, getDashboardTables } from "@/lib/supabase/queries";
+import { saveChatMessageToSession, updateSessionTitle, getDashboardTables } from "@/lib/supabase/queries";
 import type { ChatPayload } from "@/lib/types";
 
 const WEBHOOK_URL = "https://n8n-prod.10minuteschool.com/webhook/GDS-n8n";
@@ -8,23 +8,30 @@ export async function POST(req: NextRequest) {
   try {
     const payload: ChatPayload = await req.json();
 
-    if (payload.user?.id) {
-      await saveChatMessage(
+    // Save user message to session
+    if (payload.session_id && payload.user?.id) {
+      await saveChatMessageToSession(
+        payload.session_id,
         payload.dashboard_id,
         payload.user.id,
         "user",
         payload.message
       );
+
+      // Auto-title session from first user message
+      if (payload.history.length === 0) {
+        await updateSessionTitle(payload.session_id, payload.message);
+      }
     }
 
-    // Fetch and inject dashboard tables
+    // Fetch and inject dashboard tables context
     const contextTables = await getDashboardTables(payload.dashboard_number);
     if (contextTables && contextTables.length > 0) {
-      payload.context_tables = contextTables.map(t => ({
+      payload.context_tables = contextTables.map((t) => ({
         table_name: t.table_name,
         description: t.description,
         row_count: t.row_count,
-        notes: t.notes
+        notes: t.notes,
       }));
     }
 
@@ -41,7 +48,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Stream the response back to the client
     const contentType = webhookResponse.headers.get("content-type") ?? "";
     const isStream =
       contentType.includes("text/event-stream") ||
@@ -60,14 +66,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Non-streaming: return as JSON
     const text = await webhookResponse.text();
     return NextResponse.json({ response: text });
   } catch (err) {
     console.error("Chat API error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

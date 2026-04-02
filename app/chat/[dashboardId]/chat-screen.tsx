@@ -10,26 +10,28 @@ import { ChatMessageBubble } from "@/components/chat/chat-message";
 import { ChatInput } from "@/components/chat/chat-input";
 import { SuggestedPrompts } from "@/components/chat/suggested-prompts";
 import { useChat } from "@/hooks/use-chat";
-import type { Dashboard, Profile, ChatMessage } from "@/lib/types";
+import type { Dashboard, Profile, ChatMessage, ChatSession } from "@/lib/types";
 
 interface ChatScreenProps {
   dashboard: Dashboard;
   profile: Profile | null;
+  session: ChatSession;
+  sessions: ChatSession[];
   initialMessages: ChatMessage[];
 }
 
-export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenProps) {
+export function ChatScreen({ dashboard, profile, session, sessions, initialMessages }: ChatScreenProps) {
   const router = useRouter();
   const { messages, isStreaming, error, sendMessage, clearMessages } = useChat(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when messages update
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSend = (text: string) => {
     sendMessage({
+      session_id: session.id,
       dashboard_id: dashboard.id,
       dashboard_number: dashboard.dashboard_id,
       dashboard_name: dashboard.dashboard_name,
@@ -44,10 +46,10 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
   };
 
   const handleClear = async () => {
-    if (!profile) return clearMessages();
     await fetch("/api/chat/clear", {
       method: "POST",
-      body: JSON.stringify({ dashboardId: dashboard.id, profileId: profile.id }),
+      body: JSON.stringify({ sessionId: session.id }),
+      headers: { "Content-Type": "application/json" },
     });
     clearMessages();
   };
@@ -57,7 +59,12 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "#080a0f" }}>
       {/* Sidebar */}
-      <DashboardSidebar dashboard={dashboard} profile={profile} />
+      <DashboardSidebar
+        dashboard={dashboard}
+        profile={profile}
+        sessions={sessions}
+        currentSessionNumber={session.session_number}
+      />
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 relative">
@@ -66,20 +73,14 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(160deg, #0d1120 0%, #090b14 45%, #080a0f 100%)",
-            }}
+            style={{ background: "linear-gradient(160deg, #0d1120 0%, #090b14 45%, #080a0f 100%)" }}
           />
-          {/* Red ambient — top right */}
           <div className="absolute -top-20 right-1/3 w-[500px] h-[400px] rounded-full bg-primary/[0.07] blur-[120px]" />
-          {/* Blue ambient — bottom left */}
           <div className="absolute bottom-1/4 -left-10 w-[400px] h-[400px] rounded-full bg-[#4f8ef7]/[0.06] blur-[110px]" />
-          {/* Subtle center depth */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-[#1a1f3a]/30 blur-[80px]" />
         </div>
 
-        {/* Back nav + header */}
+        {/* Header */}
         <div className="relative z-10 flex items-center border-b border-white/[0.06] bg-black/20 backdrop-blur-md">
           <button
             onClick={() => router.push("/")}
@@ -88,7 +89,7 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
             <ArrowLeft className="h-4 w-4" />
           </button>
           <div className="flex-1">
-            <ChatHeader dashboard={dashboard} />
+            <ChatHeader dashboard={dashboard} sessionNumber={session.session_number} sessionTitle={session.title} />
           </div>
           {messages.length > 0 && (
             <button
@@ -117,13 +118,10 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
           )}
         </AnimatePresence>
 
-        {/* Messages area */}
+        {/* Messages */}
         <div className="relative z-10 flex-1 overflow-y-auto">
           {isEmpty ? (
-            <EmptyState
-              dashboardId={dashboard.dashboard_id}
-              dashboardName={dashboard.dashboard_name}
-            />
+            <EmptyState dashboardId={dashboard.dashboard_id} dashboardName={dashboard.dashboard_name} />
           ) : (
             <div className="px-6 py-6 flex flex-col gap-5 max-w-3xl mx-auto w-full">
               <AnimatePresence initial={false}>
@@ -136,22 +134,17 @@ export function ChatScreen({ dashboard, profile, initialMessages }: ChatScreenPr
           )}
         </div>
 
-        {/* Suggested prompts — only when empty */}
         {isEmpty && (
           <div className="relative z-10">
-            <SuggestedPrompts
-              dashboardName={dashboard.dashboard_name}
-              onSelect={handleSend}
-            />
+            <SuggestedPrompts dashboardName={dashboard.dashboard_name} onSelect={handleSend} />
           </div>
         )}
 
-        {/* Input */}
         <div className="relative z-10">
           <ChatInput
             onSend={handleSend}
             isStreaming={isStreaming}
-            placeholder={`Ask a question about Dashboard ${dashboard.dashboard_id}…`}
+            placeholder={`Ask about ${dashboard.dashboard_name}…`}
           />
         </div>
       </div>

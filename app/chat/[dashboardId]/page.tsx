@@ -1,7 +1,6 @@
-import { notFound, redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getDashboardById, getProfileByEmail, getChatHistory } from "@/lib/supabase/queries";
-import { ChatScreen } from "./chat-screen";
+import { getDashboardById, getProfileByEmail, getOrCreateLatestSession } from "@/lib/supabase/queries";
 
 interface ChatPageProps {
   params: Promise<{ dashboardId: string }>;
@@ -11,10 +10,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
   const { dashboardId } = await params;
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const [dashboard, profile] = await Promise.all([
@@ -23,11 +19,10 @@ export default async function ChatPage({ params }: ChatPageProps) {
   ]);
 
   if (!dashboard) notFound();
+  if (!profile) redirect("/login");
 
-  let initialMessages: any[] = [];
-  if (profile) {
-    initialMessages = await getChatHistory(dashboard.id, profile.id);
-  }
+  const session = await getOrCreateLatestSession(dashboard.id, profile.id);
+  if (!session) notFound();
 
-  return <ChatScreen dashboard={dashboard} profile={profile} initialMessages={initialMessages} />;
+  redirect(`/chat/${dashboardId}/${session.session_number}`);
 }

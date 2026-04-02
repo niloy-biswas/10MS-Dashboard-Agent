@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearChatHistory } from "@/lib/supabase/queries";
+import { clearSessionMessages } from "@/lib/supabase/queries";
 
 export async function POST(req: NextRequest) {
   try {
-    const { dashboardId, profileId } = await req.json();
+    const { sessionId } = await req.json();
 
-    if (!dashboardId || !profileId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!sessionId) {
+      return NextResponse.json({ error: "Missing sessionId" }, { status: 400 });
     }
 
-    const success = await clearChatHistory(dashboardId, profileId);
+    const success = await clearSessionMessages(sessionId);
 
     if (!success) {
-      return NextResponse.json({ error: "Failed to clear chat history" }, { status: 500 });
+      return NextResponse.json({ error: "Failed to clear messages" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

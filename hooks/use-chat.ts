@@ -117,11 +117,12 @@ export function useChat(initialMessages: ChatMessage[] = []) {
         }
 
         // Save assistant message to the database
-        if (payload.user?.id) {
+        if (payload.session_id && payload.user?.id) {
           await fetch("/api/chat/save", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+              sessionId: payload.session_id,
               dashboardId: payload.dashboard_id,
               profileId: payload.user.id,
               content: finalContent,
