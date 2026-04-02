@@ -39,9 +39,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
         ? { id: profile.id, name: profile.name, email: profile.email, role: profile.role }
         : null,
       message: text,
-      history: messages
-        .filter((m) => !m.isStreaming)
-        .map((m) => ({ role: m.role, content: m.content })),
+      history: [],
     });
   };
 
