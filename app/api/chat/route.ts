@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { saveChatMessageToSession, updateSessionTitle, getDashboardTables } from "@/lib/supabase/queries";
+import { saveChatMessageToSession, updateSessionTitle, getDashboardTables, getChatHistoryBySession } from "@/lib/supabase/queries";
 import type { ChatPayload } from "@/lib/types";
 
 const WEBHOOK_URL = "https://n8n-prod.10minuteschool.com/webhook/GDS-n8n";
@@ -18,8 +18,9 @@ export async function POST(req: NextRequest) {
         payload.message
       );
 
-      // Auto-title session from first user message
-      if (payload.history.length === 0) {
+      // Auto-title session from first user message only
+      const existing = await getChatHistoryBySession(payload.session_id);
+      if (existing.length === 0) {
         await updateSessionTitle(payload.session_id, payload.message);
       }
     }
