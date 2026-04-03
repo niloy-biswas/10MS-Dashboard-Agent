@@ -26,7 +26,7 @@ export function SidebarSection({ title, icon, children, defaultOpen = false }: S
         className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent/50 transition-colors"
       >
         <span className="flex items-center gap-2.5">
-          <span className="text-primary">{icon}</span>
+          <span className="text-[#60a5fa]">{icon}</span>
           {title}
         </span>
         <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
@@ -73,7 +73,7 @@ interface SessionsPanelProps {
   profileId: string;
 }
 
-function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboardId, profileId }: SessionsPanelProps) {
+function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, profileId }: SessionsPanelProps) {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
 
@@ -105,10 +105,10 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
           onClick={handleNewChat}
           disabled={creating}
           title="New Chat"
-          className="flex items-center gap-1 text-[10px] font-medium text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/15 border border-primary/20 rounded-full px-2.5 py-1 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1 text-[10px] font-medium text-[#bfdbfe] hover:text-white bg-[rgba(59,130,246,0.08)] hover:bg-[rgba(59,130,246,0.14)] border border-[rgba(59,130,246,0.22)] rounded-full px-2.5 py-1 transition-colors disabled:opacity-50"
         >
           {creating ? (
-            <span className="h-2.5 w-2.5 rounded-full border border-primary/50 border-t-primary animate-spin" />
+            <span className="h-2.5 w-2.5 rounded-full border border-[rgba(59,130,246,0.4)] border-t-[#3b82f6] animate-spin" />
           ) : (
             <Plus className="h-2.5 w-2.5" />
           )}
@@ -129,23 +129,23 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
                 onClick={() => router.push(`/chat/${dashboardUuid}/${s.session_number}`)}
                 className={`w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg transition-colors group ${
                   isActive
-                    ? "bg-primary/12 border border-primary/20 text-foreground"
+                    ? "bg-[rgba(59,130,246,0.10)] border border-[rgba(59,130,246,0.18)] text-foreground"
                     : "text-muted-foreground hover:bg-accent/50 hover:text-foreground border border-transparent"
                 }`}
               >
-                <MessageSquare className={`h-3 w-3 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground/50 group-hover:text-muted-foreground"}`} />
+                <MessageSquare className={`h-3 w-3 shrink-0 ${isActive ? "text-[#60a5fa]" : "text-muted-foreground/50 group-hover:text-muted-foreground"}`} />
                 <span className="flex-1 min-w-0">
                   <span className="truncate text-xs block leading-tight">
                     {s.title === "New Chat" ? (
                       <span className="text-muted-foreground/60">New Chat</span>
                     ) : s.title}
                   </span>
-                  <span className={`text-[10px] ${isActive ? "text-primary/60" : "text-muted-foreground/40"}`}>
+                  <span className={`text-[10px] ${isActive ? "text-[#60a5fa]/60" : "text-muted-foreground/40"}`}>
                     #{s.session_number}
                   </span>
                 </span>
                 {isActive && (
-                  <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-primary" />
+                  <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#3b82f6]" />
                 )}
               </button>
             );
@@ -171,7 +171,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
       {/* Brand */}
       <div className="px-5 py-5 border-b border-border/40">
         <div className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
+          <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_14px_rgba(59,130,246,0.30)]">
             <span className="text-white text-xs font-black">10</span>
           </div>
           <div>
@@ -187,8 +187,8 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
           Active Dashboard
         </p>
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 h-8 w-8 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
-            <span className="text-primary text-xs font-bold">{dashboard.dashboard_id}</span>
+          <div className="mt-0.5 h-8 w-8 rounded-lg bg-[rgba(59,130,246,0.12)] border border-[rgba(59,130,246,0.25)] flex items-center justify-center shrink-0">
+            <span className="text-[#93c5fd] text-xs font-bold">{dashboard.dashboard_id}</span>
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-foreground leading-tight">{dashboard.dashboard_name}</p>
@@ -207,7 +207,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
               href={dashboard.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 bg-primary/10 rounded-full px-2 py-0.5 transition-colors"
+              className="inline-flex items-center gap-1 text-[10px] text-[#93c5fd] hover:text-white bg-[rgba(59,130,246,0.10)] rounded-full px-2 py-0.5 transition-colors"
             >
               <ExternalLink className="h-2.5 w-2.5" />
               View

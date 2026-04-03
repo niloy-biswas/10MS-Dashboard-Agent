@@ -24,7 +24,7 @@ export function SuggestedPrompts({ dashboardName: _dashboardName, onSelect }: Su
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.07, duration: 0.2 }}
           onClick={() => onSelect(prompt)}
-          className="text-xs border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 rounded-full px-3.5 py-1.5 transition-all"
+          className="text-xs border border-border/60 text-muted-foreground hover:text-foreground hover:border-[rgba(59,130,246,0.35)] hover:bg-[rgba(59,130,246,0.06)] rounded-full px-3.5 py-1.5 transition-all"
         >
           {prompt}
         </motion.button>

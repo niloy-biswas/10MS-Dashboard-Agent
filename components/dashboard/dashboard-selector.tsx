@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Hash, ChevronRight, Zap, LayoutDashboard } from "lucide-react";
+import { Search, ChevronRight, Zap, LayoutDashboard } from "lucide-react";
 import type { Dashboard } from "@/lib/types";
 
 interface DashboardSearchProps {
@@ -20,7 +20,7 @@ export function DashboardSearch({ query, onChange }: DashboardSearchProps) {
         value={query}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search by dashboard ID or name..."
-        className="w-full bg-input border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/50 transition-all"
+        className="w-full bg-input border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[rgba(59,130,246,0.45)] focus:shadow-[0_0_0_4px_rgba(59,130,246,0.10)] transition-all"
         autoFocus
       />
     </div>
@@ -40,19 +40,22 @@ export function DashboardListItem({ dashboard, isSelected, onSelect }: Dashboard
       onClick={() => onSelect(dashboard)}
       className={`w-full text-left rounded-xl px-4 py-3.5 transition-all duration-200 border group flex items-center gap-4 ${
         isSelected
-          ? "bg-primary/10 border-primary/40 glow-red"
-          : "bg-secondary/40 border-border hover:bg-accent hover:border-accent-foreground/10"
+          ? "border-[rgba(96,165,250,0.55)] shadow-[0_0_0_1px_rgba(96,165,250,0.20),0_0_28px_rgba(59,130,246,0.16),0_12px_40px_rgba(3,8,20,0.45)]"
+          : "bg-secondary/40 border-border hover:bg-accent hover:border-[rgba(59,130,246,0.22)] hover:shadow-[0_8px_24px_rgba(4,10,22,0.35),0_0_0_1px_rgba(59,130,246,0.06)]"
       }`}
+      style={isSelected ? {
+        background: "linear-gradient(180deg, rgba(17,27,46,0.96) 0%, rgba(12,20,36,0.98) 100%)",
+      } : {}}
       whileHover={{ scale: 1.005 }}
       whileTap={{ scale: 0.998 }}
     >
       {/* ID badge */}
       <div
-        className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-mono font-bold tracking-wider ${
+        className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-mono font-bold tracking-wider transition-colors ${
           isSelected
-            ? "bg-primary/20 text-primary"
-            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-        } transition-colors`}
+            ? "bg-[rgba(59,130,246,0.16)] text-[#bfdbfe] border border-[rgba(59,130,246,0.28)]"
+            : "bg-[rgba(255,255,255,0.04)] text-[#b8c4d6] group-hover:bg-[rgba(59,130,246,0.10)] group-hover:text-[#93c5fd]"
+        }`}
       >
         {dashboard.dashboard_id}
       </div>
@@ -69,13 +72,13 @@ export function DashboardListItem({ dashboard, isSelected, onSelect }: Dashboard
 
       {/* Refresh window pill */}
       {dashboard.refresh_window && (
-        <span className="shrink-0 hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted rounded-full px-2.5 py-0.5">
+        <span className="shrink-0 hidden sm:inline-flex items-center gap-1 text-xs text-[#b9d6ff] bg-[rgba(59,130,246,0.10)] border border-[rgba(59,130,246,0.18)] rounded-full px-2.5 py-0.5">
           <Zap className="h-2.5 w-2.5" />
           {dashboard.refresh_window}
         </span>
       )}
 
-      <ChevronRight className={`shrink-0 h-3.5 w-3.5 transition-transform ${isSelected ? "text-primary translate-x-0.5" : "text-muted-foreground/40 group-hover:text-muted-foreground"}`} />
+      <ChevronRight className={`shrink-0 h-3.5 w-3.5 transition-transform ${isSelected ? "text-[#60a5fa] translate-x-0.5" : "text-muted-foreground/40 group-hover:text-[#60a5fa]"}`} />
     </motion.button>
   );
 }
@@ -147,7 +150,16 @@ export function DashboardSelector({ dashboards, onSelect }: DashboardSelectorPro
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             onClick={() => onSelect(selected)}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl py-3 text-sm transition-all glow-red flex items-center justify-center gap-2"
+            className="w-full text-[#f8fbff] font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(37,99,235,0.35)] hover:shadow-[0_10px_36px_rgba(37,99,235,0.50)]"
+            style={{
+              background: "linear-gradient(180deg, #3B82F6 0%, #2563EB 100%)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(180deg, #60A5FA 0%, #3B82F6 100%)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(180deg, #3B82F6 0%, #2563EB 100%)";
+            }}
           >
             Open Dashboard {selected.dashboard_id}
             <ChevronRight className="h-4 w-4" />

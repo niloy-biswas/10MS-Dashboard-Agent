@@ -14,8 +14,8 @@ export function ChatHeader({ dashboard, sessionNumber, sessionTitle }: ChatHeade
   return (
     <div className="h-14 shrink-0 px-6 flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <div className="h-7 w-7 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center">
-          <span className="text-primary text-xs font-bold">{dashboard.dashboard_id}</span>
+        <div className="h-7 w-7 rounded-lg bg-[rgba(59,130,246,0.12)] border border-[rgba(59,130,246,0.25)] flex items-center justify-center">
+          <span className="text-[#93c5fd] text-xs font-bold">{dashboard.dashboard_id}</span>
         </div>
         <div>
           <p className="text-sm font-semibold text-foreground leading-none">{dashboard.dashboard_name}</p>
@@ -27,7 +27,7 @@ export function ChatHeader({ dashboard, sessionNumber, sessionTitle }: ChatHeade
         </div>
       </div>
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground border border-white/[0.08] rounded-full px-3 py-1.5">
-        <Sparkles className="h-3 w-3 text-primary" />
+        <Sparkles className="h-3 w-3 text-[#60a5fa]" />
         AI Assistant
       </div>
     </div>
@@ -44,10 +44,10 @@ export function EmptyState({ dashboardId, dashboardName }: { dashboardId: string
         className="flex flex-col items-center gap-4 text-center max-w-sm"
       >
         <div className="relative">
-          <div className="h-16 w-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <LayoutDashboard className="h-7 w-7 text-primary" />
+          <div className="h-16 w-16 rounded-2xl bg-[rgba(59,130,246,0.10)] border border-[rgba(59,130,246,0.20)] flex items-center justify-center">
+            <LayoutDashboard className="h-7 w-7 text-[#60a5fa]" />
           </div>
-          <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-primary/90 flex items-center justify-center">
+          <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
             <Sparkles className="h-2.5 w-2.5 text-white" />
           </div>
         </div>

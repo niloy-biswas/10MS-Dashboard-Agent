@@ -37,7 +37,7 @@ export function UserAvatar({ name, avatarUrl, size = "md" }: UserAvatarProps) {
 
   return (
     <div
-      className={`${sizeClass} rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center ${textClass} font-bold text-primary shrink-0`}
+      className={`${sizeClass} rounded-full bg-[rgba(59,130,246,0.15)] border border-[rgba(59,130,246,0.25)] flex items-center justify-center ${textClass} font-bold text-[#93c5fd] shrink-0`}
     >
       {initials}
     </div>

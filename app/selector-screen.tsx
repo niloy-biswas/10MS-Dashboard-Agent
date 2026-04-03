@@ -24,8 +24,8 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
     <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Ambient glow background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[30%] w-[400px] h-[400px] rounded-full bg-[#4f8ef7]/5 blur-[100px]" />
+        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-primary/8 blur-[140px]" />
+        <div className="absolute bottom-[-10%] left-[30%] w-[400px] h-[400px] rounded-full bg-primary/5 blur-[100px]" />
       </div>
 
       {/* Card */}
@@ -36,13 +36,13 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
         className="relative w-full max-w-lg bg-card border border-border/60 rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* Top gradient line */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
 
         <div className="px-8 pt-8 pb-4">
           {/* Brand + profile row */}
           <div className="flex items-center justify-between mb-7">
             <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_14px_rgba(229,57,53,0.4)]">
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_18px_rgba(59,130,246,0.35)]">
                 <BarChart2 className="h-4 w-4 text-white" />
               </div>
               <div>
@@ -65,7 +65,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
 
           {/* Heading */}
           <div className="mb-6 text-center">
-            <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 text-[11px] text-primary font-medium mb-3">
+            <div className="inline-flex items-center gap-1.5 bg-[rgba(59,130,246,0.10)] border border-[rgba(59,130,246,0.28)] rounded-full px-3 py-1 text-[11px] text-[#93c5fd] font-medium mb-3">
               <Sparkles className="h-3 w-3" />
               AI-Powered Analytics
             </div>

@@ -113,8 +113,8 @@ export default function SignupPage() {
 
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[700px] h-[600px] rounded-full bg-primary/7 blur-[160px]" />
-        <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] rounded-full bg-[#4f8ef7]/5 blur-[120px]" />
+        <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[700px] h-[600px] rounded-full bg-primary/8 blur-[160px]" />
+        <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] rounded-full bg-primary/5 blur-[120px]" />
       </div>
 
       {/* Vertical accent lines */}
@@ -129,7 +129,7 @@ export default function SignupPage() {
       >
         <div className="bg-card border border-border/60 rounded-2xl shadow-[0_32px_80px_rgba(0,0,0,0.6)] overflow-hidden">
           {/* Top accent */}
-          <div className="h-[1.5px] bg-gradient-to-r from-transparent via-primary/80 to-transparent" />
+          <div className="h-[1.5px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
 
           <div className="px-8 py-8">
             {/* Brand */}
@@ -139,7 +139,7 @@ export default function SignupPage() {
               transition={{ delay: 0.1, duration: 0.4 }}
               className="flex items-center gap-3 mb-9"
             >
-              <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shadow-[0_0_24px_rgba(229,57,53,0.5)]">
+              <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shadow-[0_0_24px_rgba(59,130,246,0.40)]">
                 <BarChart2 className="h-[18px] w-[18px] text-white" />
               </div>
               <div>
@@ -234,7 +234,7 @@ export default function SignupPage() {
                   required
                   autoComplete="name"
                   placeholder="Your name"
-                  className="w-full h-11 px-4 rounded-xl bg-input border border-border/60 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 transition-all duration-200"
+                  className="w-full h-11 px-4 rounded-xl bg-input border border-border/60 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[rgba(59,130,246,0.45)] focus:ring-2 focus:ring-[rgba(59,130,246,0.12)] transition-all duration-200"
                 />
               </div>
 
@@ -289,7 +289,7 @@ export default function SignupPage() {
                     required
                     autoComplete="new-password"
                     placeholder="Min. 6 characters"
-                    className="w-full h-11 px-4 pr-12 rounded-xl bg-input border border-border/60 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 transition-all duration-200"
+                    className="w-full h-11 px-4 pr-12 rounded-xl bg-input border border-border/60 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-[rgba(59,130,246,0.45)] focus:ring-2 focus:ring-[rgba(59,130,246,0.12)] transition-all duration-200"
                   />
                   <button
                     type="button"
@@ -308,7 +308,10 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={loading || (showDomainFeedback && !isValidDomain)}
-                className="w-full h-11 mt-1 bg-primary hover:bg-primary/90 active:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_24px_rgba(229,57,53,0.35)] hover:shadow-[0_4px_32px_rgba(229,57,53,0.5)] transition-all duration-200"
+                className="w-full h-11 mt-1 disabled:opacity-50 disabled:cursor-not-allowed text-[#f8fbff] text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_24px_rgba(37,99,235,0.35)] hover:shadow-[0_4px_32px_rgba(37,99,235,0.50)] transition-all duration-200"
+                style={{ background: "linear-gradient(180deg, #3B82F6 0%, #2563EB 100%)" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(180deg, #60A5FA 0%, #3B82F6 100%)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(180deg, #3B82F6 0%, #2563EB 100%)"; }}
               >
                 {loading ? (
                   <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
@@ -328,7 +331,7 @@ export default function SignupPage() {
               Already have access?{" "}
               <Link
                 href="/login"
-                className="text-primary hover:text-primary/80 font-semibold transition-colors"
+                className="text-[#60a5fa] hover:text-[#93c5fd] font-semibold transition-colors"
               >
                 Sign in
               </Link>

@@ -39,7 +39,7 @@ export function ChatInput({ onSend, isStreaming, placeholder = "Ask a question..
   return (
     <div className="px-4 pb-5 pt-3 border-t border-border/50 bg-background/80 backdrop-blur-sm">
       <div className={`flex items-end gap-3 bg-card border rounded-2xl px-4 py-3 transition-all ${
-        isStreaming ? "border-primary/30" : "border-border/60 focus-within:border-primary/40 focus-within:shadow-[0_0_0_3px_rgba(229,57,53,0.08)]"
+        isStreaming ? "border-[rgba(59,130,246,0.30)]" : "border-border/60 focus-within:border-[rgba(59,130,246,0.45)] focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.10)]"
       }`}>
         <textarea
           ref={textareaRef}
