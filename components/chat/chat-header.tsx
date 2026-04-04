@@ -14,7 +14,7 @@ export function ChatHeader({ dashboard, sessionNumber, sessionTitle }: ChatHeade
   return (
     <div className="h-14 shrink-0 px-6 flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <div className="h-7 w-7 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center">
+        <div className="h-7 min-w-7 px-1.5 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center">
           <span className="text-primary text-xs font-bold">{dashboard.dashboard_id}</span>
         </div>
         <div>
