@@ -49,20 +49,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const contentType = webhookResponse.headers.get("content-type") ?? "";
-    const isStream =
-      contentType.includes("text/event-stream") ||
-      contentType.includes("text/plain") ||
-      contentType.includes("application/octet-stream");
-
-    if (webhookResponse.body && isStream) {
+    if (webhookResponse.body) {
       return new NextResponse(webhookResponse.body, {
         status: 200,
         headers: {
           "Content-Type": "text/plain; charset=utf-8",
           "Transfer-Encoding": "chunked",
           "X-Content-Type-Options": "nosniff",
-          "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache, no-transform",
+          "X-Accel-Buffering": "no",
         },
       });
     }

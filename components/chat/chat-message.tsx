@@ -116,7 +116,6 @@ function parseContentParts(content: string): ContentPart[] {
       const spec = JSON.parse(match[1].trim()) as ChartSpec;
       parts.push({ type: "chart", spec });
     } catch {
-      // If JSON is malformed, render as plain markdown
       parts.push({ type: "markdown", content: match[0] });
     }
     lastIndex = match.index + match[0].length;
@@ -126,7 +125,7 @@ function parseContentParts(content: string): ContentPart[] {
     parts.push({ type: "markdown", content: content.slice(lastIndex) });
   }
 
-  return parts.length > 0 ? parts : [{ type: "markdown", content }];
+  return parts.length > 0 ? parts : [{ type: "markdown", content: content }];
 }
 
 interface ChatMessageProps {
@@ -182,7 +181,10 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
             <TypingDots />
           ) : (
             <div className="overflow-x-auto">
-              {parseContentParts(message.content).map((part, i) =>
+              {(message.isStreaming
+                ? [{ type: "markdown" as const, content: message.content }]
+                : parseContentParts(message.content)
+              ).map((part, i) =>
                 part.type === "chart" ? (
                   <ChartBlock key={i} spec={part.spec} />
                 ) : (
