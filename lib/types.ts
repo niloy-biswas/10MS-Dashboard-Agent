@@ -29,6 +29,7 @@ export interface ChatMessage {
   createdAt: string;
   isStreaming?: boolean;
   hasError?: boolean;
+  thinkingState?: "thinking" | "querying" | null;
 }
 
 export interface ChatSession {

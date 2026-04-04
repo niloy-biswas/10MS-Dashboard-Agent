@@ -92,12 +92,23 @@ export function useChat(initialMessages: ChatMessage[] = []) {
                     break;
                   }
                   isN8nStream = true;
+                  const nodeName = chunk.metadata?.nodeName ?? "";
+                  const newState = nodeName.toLowerCase().includes("bigquery") || nodeName.toLowerCase().includes("sql")
+                    ? "querying"
+                    : "thinking";
+                  setMessages((prev) =>
+                    prev.map((m) =>
+                      m.id === assistantId
+                        ? { ...m, thinkingState: newState }
+                        : m
+                    )
+                  );
                 } else if (chunk.type === "item" && chunk.content) {
                   streamedContent += chunk.content;
                   setMessages((prev) =>
                     prev.map((m) =>
                       m.id === assistantId
-                        ? { ...m, content: streamedContent, isStreaming: true }
+                        ? { ...m, content: streamedContent, isStreaming: true, thinkingState: null }
                         : m
                     )
                   );
