@@ -102,12 +102,11 @@ export function useChat(initialMessages: ChatMessage[] = []) {
                     )
                   );
                 } else if (chunk.type === "error") {
-                  streamedContent = "⚠️ Something went wrong while running the query. Please try rephrasing your question or try again.";
                   streamDone = true;
                   setMessages((prev) =>
                     prev.map((m) =>
                       m.id === assistantId
-                        ? { ...m, content: streamedContent, isStreaming: false }
+                        ? { ...m, content: streamedContent, isStreaming: false, hasError: true }
                         : m
                     )
                   );

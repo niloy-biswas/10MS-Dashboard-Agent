@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { AlertCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { FileDown } from "lucide-react";
@@ -240,6 +241,12 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
                   </ReactMarkdown>
                 )
               )}
+            </div>
+          )}
+          {message.hasError && (
+            <div className="flex items-start gap-2 mt-3 px-3 py-2.5 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive text-xs">
+              <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <span>Something went wrong while running the query. Please try rephrasing your question or try again.</span>
             </div>
           )}
         </div>
