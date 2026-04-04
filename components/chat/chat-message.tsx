@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { AlertCircle, FileDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { FileDown } from "lucide-react";
 import type { ChatMessage } from "@/lib/types";
 import { ChartBlock, type ChartSpec } from "@/components/chat/chart-block";
+import { THINKING_MESSAGES, QUERYING_MESSAGES } from "@/lib/thinking-messages";
 
 // Extract plain text from React children recursively
 function extractText(node: React.ReactNode): string {
@@ -116,7 +117,6 @@ function parseContentParts(content: string): ContentPart[] {
       const spec = JSON.parse(match[1].trim()) as ChartSpec;
       parts.push({ type: "chart", spec });
     } catch {
-      // If JSON is malformed, render as plain markdown
       parts.push({ type: "markdown", content: match[0] });
     }
     lastIndex = match.index + match[0].length;
@@ -126,25 +126,69 @@ function parseContentParts(content: string): ContentPart[] {
     parts.push({ type: "markdown", content: content.slice(lastIndex) });
   }
 
-  return parts.length > 0 ? parts : [{ type: "markdown", content }];
+  return parts.length > 0 ? parts : [{ type: "markdown", content: content }];
 }
 
 interface ChatMessageProps {
   message: ChatMessage;
 }
 
-function TypingDots() {
+function ThinkingIndicator({ state }: { state: "thinking" | "querying" }) {
+  const pool = state === "querying" ? QUERYING_MESSAGES : THINKING_MESSAGES;
+  const [fullText, setFullText] = useState(() => pool[Math.floor(Math.random() * pool.length)]);
+  const [displayed, setDisplayed] = useState("");
+
+  // Pick new message when state changes
+  useEffect(() => {
+    const next = pool[Math.floor(Math.random() * pool.length)];
+    setFullText(next);
+    setDisplayed("");
+  }, [state]);
+
+  // Rotate message every 3s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const next = pool[Math.floor(Math.random() * pool.length)];
+      setFullText(next);
+      setDisplayed("");
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [state]);
+
+  // Typewriter: reveal one character at a time
+  useEffect(() => {
+    if (displayed.length >= fullText.length) return;
+    const timeout = setTimeout(() => {
+      setDisplayed(fullText.slice(0, displayed.length + 1));
+    }, 28);
+    return () => clearTimeout(timeout);
+  }, [displayed, fullText]);
+
   return (
-    <span className="inline-flex items-end gap-1 h-4 px-1">
-      {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          className="block h-1.5 w-1.5 rounded-full bg-white/40"
-          animate={{ y: [0, -4, 0] }}
-          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
-        />
-      ))}
-    </span>
+    <div className="flex items-center gap-3">
+      {/* Pulsing dot trio */}
+      <span className="inline-flex items-center gap-[5px] shrink-0">
+        {[0, 1, 2].map((i) => (
+          <motion.span
+            key={i}
+            className="block rounded-full bg-muted-foreground/50"
+            style={{ width: i === 1 ? 5 : 4, height: i === 1 ? 5 : 4 }}
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+          />
+        ))}
+      </span>
+      <span className="text-xs text-muted-foreground tracking-wide">
+        {displayed}
+        {displayed.length < fullText.length && (
+          <motion.span
+            animate={{ opacity: [1, 0] }}
+            transition={{ duration: 0.5, repeat: Infinity }}
+            className="inline-block w-[1px] h-3 bg-muted-foreground/60 ml-[1px] align-middle"
+          />
+        )}
+      </span>
+    </div>
   );
 }
 
@@ -173,16 +217,19 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
       ) : (
         /* ── Assistant: glass card, full width ── */
         <div
-          className={`w-full rounded-2xl rounded-bl-sm px-5 py-4 text-sm leading-relaxed text-[#dde3f0]
+          className={`w-full rounded-2xl rounded-bl-sm px-5 py-4 text-sm leading-[1.75] text-[#dde3f0]
             bg-white/[0.05] backdrop-blur-md
             border border-white/[0.08]
-            ${message.isStreaming ? "streaming-cursor" : ""}`}
+            ${message.isStreaming && message.content.length > 0 ? "streaming-cursor" : ""}`}
         >
           {message.content.length === 0 && message.isStreaming ? (
-            <TypingDots />
+            <ThinkingIndicator state={message.thinkingState === "querying" ? "querying" : "thinking"} />
           ) : (
             <div className="overflow-x-auto">
-              {parseContentParts(message.content).map((part, i) =>
+              {(message.isStreaming
+                ? [{ type: "markdown" as const, content: message.content }]
+                : parseContentParts(message.content)
+              ).map((part, i) =>
                 part.type === "chart" ? (
                   <ChartBlock key={i} spec={part.spec} />
                 ) : (
@@ -238,6 +285,12 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
                   </ReactMarkdown>
                 )
               )}
+            </div>
+          )}
+          {message.hasError && (
+            <div className="flex items-start gap-2 mt-3 px-3 py-2.5 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive text-xs">
+              <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <span>Something went wrong while running the query. Please try rephrasing your question or try again.</span>
             </div>
           )}
         </div>

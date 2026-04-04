@@ -49,55 +49,91 @@ export function useChat(initialMessages: ChatMessage[] = []) {
 
         const contentType = res.headers.get("content-type") ?? "";
 
-        // Helper to extract text from n8n's JSON format [{"output": "..."}]
-        const extractText = (raw: string) => {
+        // Legacy fallback for non-streaming n8n format: [{"output":"..."}]
+        const extractLegacyText = (raw: string) => {
           try {
             const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].output) {
-              return parsed[0].output;
-            }
+            if (Array.isArray(parsed) && parsed[0]?.output) return parsed[0].output;
             if (parsed.output) return parsed.output;
-          } catch(e) {
-            // Not valid JSON or partial JSON
-          }
-          
-          // Fallback regex to clean up display if JSON parsing fails (e.g. during partial stream)
+          } catch { /* partial JSON */ }
           const match = raw.match(/"output"\s*:\s*"([^]*)"/);
-          if (match && match[1]) {
-             // Replace json escaped newlines so they render correctly
-             return match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
-          }
-          
-          return raw; 
+          if (match?.[1]) return match[1].replace(/\\n/g, "\n").replace(/\\"/g, '"');
+          return raw;
         };
 
         // Handle streaming response
         if (res.body && contentType.includes("text")) {
           const reader = res.body.getReader();
           const decoder = new TextDecoder();
-          let accumulated = "";
+          let buffer = "";
+          let streamedContent = "";
+          let isN8nStream = false;
+          let streamDone = false;
 
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            const chunk = decoder.decode(value, { stream: true });
-            accumulated += chunk;
+            if (streamDone) continue;
 
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantId
-                  ? { ...m, content: extractText(accumulated), isStreaming: true }
-                  : m
-              )
-            );
+            buffer += decoder.decode(value, { stream: true });
+
+            // n8n sends JSON objects separated by whitespace.
+            // Each object ends with }} (nested metadata). Split on }} followed by whitespace and {.
+            const chunks = buffer.replace(/\}\}\s+\{/g, "}}\n{").split("\n");
+            buffer = chunks.pop() ?? ""; // last chunk may be incomplete
+
+            for (const raw of chunks) {
+              if (streamDone) break;
+              try {
+                const chunk = JSON.parse(raw) as { type: string; content?: string; metadata?: { nodeName?: string } };
+                if (chunk.type === "begin") {
+                  if (chunk.metadata?.nodeName === "Respond to Webhook") {
+                    streamDone = true;
+                    break;
+                  }
+                  isN8nStream = true;
+                  const nodeName = chunk.metadata?.nodeName ?? "";
+                  const newState = nodeName.toLowerCase().includes("bigquery") || nodeName.toLowerCase().includes("sql")
+                    ? "querying"
+                    : "thinking";
+                  setMessages((prev) =>
+                    prev.map((m) =>
+                      m.id === assistantId
+                        ? { ...m, thinkingState: newState }
+                        : m
+                    )
+                  );
+                } else if (chunk.type === "item" && chunk.content) {
+                  streamedContent += chunk.content;
+                  setMessages((prev) =>
+                    prev.map((m) =>
+                      m.id === assistantId
+                        ? { ...m, content: streamedContent, isStreaming: true, thinkingState: null }
+                        : m
+                    )
+                  );
+                } else if (chunk.type === "error") {
+                  streamDone = true;
+                  setMessages((prev) =>
+                    prev.map((m) =>
+                      m.id === assistantId
+                        ? { ...m, content: streamedContent, isStreaming: false, hasError: true }
+                        : m
+                    )
+                  );
+                  break;
+                }
+              } catch { /* incomplete JSON, skip */ }
+            }
           }
-          finalContent = extractText(accumulated);
+
+          finalContent = isN8nStream ? streamedContent : extractLegacyText(buffer || streamedContent);
         } else {
           // Non-streaming JSON fallback
           const data = await res.json();
           const responseText = data.response ?? JSON.stringify(data);
-          metadata = data.metadata; // Expecting metadata from API if provided
-          finalContent = extractText(responseText);
+          metadata = data.metadata;
+          finalContent = extractLegacyText(responseText);
           setMessages((prev) =>
             prev.map((m) =>
               m.id === assistantId

@@ -28,6 +28,8 @@ export interface ChatMessage {
   metadata?: Record<string, any>;
   createdAt: string;
   isStreaming?: boolean;
+  hasError?: boolean;
+  thinkingState?: "thinking" | "querying" | null;
 }
 
 export interface ChatSession {

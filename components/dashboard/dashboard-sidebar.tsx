@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, BarChart2, Filter, Info, ExternalLink, Clock, Plus, MessageSquare } from "lucide-react";
+import Image from "next/image";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
 import type { Dashboard, Profile, ChatSession } from "@/lib/types";
@@ -73,7 +74,7 @@ interface SessionsPanelProps {
   profileId: string;
 }
 
-function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboardId, profileId }: SessionsPanelProps) {
+function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, profileId }: SessionsPanelProps) {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
 
@@ -98,7 +99,7 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
     <div className="px-3 py-3 border-b border-border/40">
       {/* Header row */}
       <div className="flex items-center justify-between mb-2 px-1">
-        <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+        <p className="text-[9px] font-bold tracking-[0.12em] text-muted-foreground/50 uppercase">
           Chat History
         </p>
         <button
@@ -171,8 +172,8 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
       {/* Brand */}
       <div className="px-5 py-5 border-b border-border/40">
         <div className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-white text-xs font-black">10</span>
+          <div className="h-7 w-7 rounded-lg overflow-hidden shrink-0">
+            <Image src="/10ms-logo.png" alt="10MS" width={28} height={28} className="object-cover w-full h-full" />
           </div>
           <div>
             <p className="text-xs font-bold text-foreground tracking-wide">10MS ANALYTICS</p>
@@ -183,11 +184,11 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
 
       {/* Active dashboard info */}
       <div className="px-4 py-4 border-b border-border/40">
-        <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase mb-2">
+        <p className="text-[9px] font-bold tracking-[0.12em] text-muted-foreground/50 uppercase mb-2">
           Active Dashboard
         </p>
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 h-8 w-8 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
+          <div className="mt-0.5 h-8 min-w-8 px-1.5 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
             <span className="text-primary text-xs font-bold">{dashboard.dashboard_id}</span>
           </div>
           <div className="min-w-0">
