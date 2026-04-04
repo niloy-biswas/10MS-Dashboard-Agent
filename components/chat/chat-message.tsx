@@ -173,7 +173,7 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
       ) : (
         /* ── Assistant: glass card, full width ── */
         <div
-          className={`w-full rounded-2xl rounded-bl-sm px-5 py-4 text-sm leading-relaxed text-[#dde3f0]
+          className={`w-full rounded-2xl rounded-bl-sm px-5 py-4 text-sm leading-[1.75] text-[#dde3f0]
             bg-white/[0.05] backdrop-blur-md
             border border-white/[0.08]
             ${message.isStreaming ? "streaming-cursor" : ""}`}
