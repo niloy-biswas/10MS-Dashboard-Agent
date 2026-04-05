@@ -8,7 +8,6 @@ import {
   Eye,
   EyeOff,
   UserPlus,
-  BarChart2,
   AlertCircle,
   CheckCircle2,
   XCircle,
@@ -137,19 +136,19 @@ export default function SignupPage() {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4 }}
-              className="flex items-center gap-3 mb-9"
+              className="flex flex-col items-center gap-1 mb-7"
             >
-              <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shadow-[0_0_24px_rgba(229,57,53,0.5)]">
-                <BarChart2 className="h-[18px] w-[18px] text-white" />
-              </div>
-              <div>
-                <p className="text-[11px] font-black tracking-[0.18em] text-foreground uppercase">
-                  10MS Analytics
-                </p>
-                <p className="text-[10px] text-muted-foreground tracking-wider mt-0.5">
-                  Internal Intelligence
-                </p>
-              </div>
+              <img
+                src="/TenTen Lottie Animation Blink Smile.gif"
+                alt="TenTen"
+                className="h-20 w-20 object-contain mb-1"
+              />
+              <p className="text-2xl font-black tracking-tight text-center font-mono bg-gradient-to-r from-[#d63031] via-[#a855b5] to-[#4c51bf] bg-clip-text text-transparent">
+                10MS Analytics
+              </p>
+              <p className="text-[10px] text-muted-foreground tracking-widest text-center uppercase">
+                Internal Intelligence
+              </p>
             </motion.div>
 
             {/* Heading */}
@@ -159,10 +158,10 @@ export default function SignupPage() {
               transition={{ delay: 0.15, duration: 0.4 }}
               className="mb-7"
             >
-              <h1 className="text-[22px] font-bold text-foreground tracking-tight leading-tight">
+              <h1 className="text-lg font-semibold text-foreground tracking-tight leading-tight text-center">
                 Request access
               </h1>
-              <p className="text-sm text-muted-foreground mt-1.5">
+              <p className="text-sm text-muted-foreground mt-2 text-center">
                 Create your account with your 10MS email
               </p>
             </motion.div>
@@ -333,8 +332,8 @@ export default function SignupPage() {
                 Sign in
               </Link>
             </p>
-            <p className="text-[10px] text-muted-foreground/30 font-mono tracking-wider">
-              10MS · Internal
+            <p className="text-[10px] text-muted-foreground/30 tracking-wide">
+              Built by the creators of TenTen
             </p>
           </div>
         </div>
@@ -342,6 +341,7 @@ export default function SignupPage() {
         <p className="text-center text-[10px] text-muted-foreground/40 mt-5 tracking-wider uppercase">
           Restricted to @10minuteschool.com accounts
         </p>
+
       </motion.div>
     </main>
   );

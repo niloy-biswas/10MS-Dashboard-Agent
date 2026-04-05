@@ -46,8 +46,8 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
                 <BarChart2 className="h-4 w-4 text-white" />
               </div>
               <div>
-                <p className="text-xs font-bold tracking-widest text-foreground uppercase">10MS Analytics</p>
-                <p className="text-[10px] text-muted-foreground">Internal Intelligence</p>
+                <p className="text-base font-black font-mono tracking-tight bg-gradient-to-r from-[#d63031] via-[#a855b5] to-[#4c51bf] bg-clip-text text-transparent">10MS Analytics</p>
+                <p className="text-[9px] text-muted-foreground tracking-wide uppercase">Internal Intelligence</p>
               </div>
             </div>
 
@@ -67,7 +67,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
           <div className="mb-6 text-center">
             <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 text-[11px] text-primary font-medium mb-3">
               <Sparkles className="h-3 w-3" />
-              AI-Powered Analytics
+              TenTen-Powered Analytics
             </div>
             <h1 className="text-2xl font-bold text-foreground tracking-tight">Select a Dashboard</h1>
             <p className="text-sm text-muted-foreground mt-1.5">
