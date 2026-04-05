@@ -105,10 +105,15 @@ export function useChat(initialMessages: ChatMessage[] = []) {
                   );
                 } else if (chunk.type === "item" && chunk.content) {
                   streamedContent += chunk.content;
+                  // Normalize \n and strip tool call logs for live display
+                  const liveContent = streamedContent
+                    .replace(/\\n/g, "\n")
+                    .replace(/Calling [^\n]+\{[^}]*(?:\{[^}]*\}[^}]*)*\}[^\n]*---?/g, "")
+                    .trim();
                   setMessages((prev) =>
                     prev.map((m) =>
                       m.id === assistantId
-                        ? { ...m, content: streamedContent, isStreaming: true, thinkingState: null }
+                        ? { ...m, content: liveContent, isStreaming: true, thinkingState: null }
                         : m
                     )
                   );
@@ -127,7 +132,15 @@ export function useChat(initialMessages: ChatMessage[] = []) {
             }
           }
 
-          finalContent = isN8nStream ? streamedContent : extractLegacyText(buffer || streamedContent);
+          // Normalize literal \n → real newlines and strip n8n internal tool call logs
+          // e.g. "Calling SQL query in BigQuery with input: {...}---"
+          const normalize = (raw: string) =>
+            raw
+              .replace(/\\n/g, "\n")
+              .replace(/Calling [^\n]+\{[^}]*(?:\{[^}]*\}[^}]*)*\}[^\n]*---?/g, "")
+              .trim();
+
+          finalContent = normalize(isN8nStream ? streamedContent : extractLegacyText(buffer || streamedContent));
         } else {
           // Non-streaming JSON fallback
           const data = await res.json();
