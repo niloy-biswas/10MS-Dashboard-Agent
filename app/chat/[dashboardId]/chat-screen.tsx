@@ -24,9 +24,14 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
   const router = useRouter();
   const { messages, isStreaming, error, sendMessage } = useChat(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const prevMessageCountRef = useRef(messages.length);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const isNewMessage = messages.length !== prevMessageCountRef.current;
+    prevMessageCountRef.current = messages.length;
+    bottomRef.current?.scrollIntoView({
+      behavior: isNewMessage ? "smooth" : "instant",
+    });
   }, [messages]);
 
   const handleSend = (text: string) => {
