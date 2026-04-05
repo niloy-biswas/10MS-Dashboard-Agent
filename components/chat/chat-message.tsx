@@ -224,12 +224,12 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
         >
           {message.content.length === 0 && message.isStreaming ? (
             <ThinkingIndicator state={message.thinkingState === "querying" ? "querying" : "thinking"} />
+          ) : message.isStreaming ? (
+            /* During streaming: plain pre-wrap text, no re-parsing on every token */
+            <div className="whitespace-pre-wrap break-words">{message.content}</div>
           ) : (
             <div className="overflow-x-auto">
-              {(message.isStreaming
-                ? [{ type: "markdown" as const, content: message.content }]
-                : parseContentParts(message.content)
-              ).map((part, i) =>
+              {parseContentParts(message.content).map((part, i) =>
                 part.type === "chart" ? (
                   <ChartBlock key={i} spec={part.spec} />
                 ) : (
