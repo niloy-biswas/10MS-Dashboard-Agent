@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
-  getDashboardById,
+  getDashboardByAnyId,
   getProfileByEmail,
   getChatSessionByNumber,
   getChatSessions,
@@ -24,7 +24,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
   if (!user) redirect("/login");
 
   const [dashboard, profile] = await Promise.all([
-    getDashboardById(dashboardId),
+    getDashboardByAnyId(dashboardId),
     getProfileByEmail(user.email!),
   ]);
 

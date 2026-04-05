@@ -17,7 +17,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
   const router = useRouter();
 
   const handleSelect = (dashboard: Dashboard) => {
-    router.push(`/chat/${dashboard.id}`);
+    router.push(`/chat/${dashboard.dashboard_id}`);
   };
 
   return (

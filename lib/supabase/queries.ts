@@ -35,6 +35,23 @@ export async function getDashboardById(id: string): Promise<Dashboard | null> {
   return data as Dashboard;
 }
 
+export async function getDashboardByShortId(shortId: string): Promise<Dashboard | null> {
+  const { data, error } = await supabase
+    .from("dashboards")
+    .select("*")
+    .eq("dashboard_id", shortId)
+    .single();
+
+  if (error) return null;
+  return data as Dashboard;
+}
+
+// Accepts either UUID or short ID (e.g. "G107")
+export async function getDashboardByAnyId(id: string): Promise<Dashboard | null> {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  return isUuid ? getDashboardById(id) : getDashboardByShortId(id);
+}
+
 export async function getUserProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")

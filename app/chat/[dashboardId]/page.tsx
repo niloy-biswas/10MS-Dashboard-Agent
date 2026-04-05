@@ -1,6 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getDashboardById, getProfileByEmail, getOrCreateLatestSession } from "@/lib/supabase/queries";
+import { getDashboardByAnyId, getProfileByEmail, getOrCreateLatestSession } from "@/lib/supabase/queries";
 
 interface ChatPageProps {
   params: Promise<{ dashboardId: string }>;
@@ -14,7 +14,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
   if (!user) redirect("/login");
 
   const [dashboard, profile] = await Promise.all([
-    getDashboardById(dashboardId),
+    getDashboardByAnyId(dashboardId),
     getProfileByEmail(user.email!),
   ]);
 
@@ -24,5 +24,5 @@ export default async function ChatPage({ params }: ChatPageProps) {
   const session = await getOrCreateLatestSession(dashboard.id, profile.id);
   if (!session) notFound();
 
-  redirect(`/chat/${dashboardId}/${session.session_number}`);
+  redirect(`/chat/${dashboard.dashboard_id}/${session.session_number}`);
 }
