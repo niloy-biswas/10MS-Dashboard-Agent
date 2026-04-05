@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, LayoutDashboard } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import type { Dashboard } from "@/lib/types";
 
 interface ChatHeaderProps {
@@ -34,7 +34,7 @@ export function ChatHeader({ dashboard, sessionNumber, sessionTitle }: ChatHeade
   );
 }
 
-export function EmptyState({ dashboardId, dashboardName }: { dashboardId: string; dashboardName: string }) {
+export function EmptyState({ dashboardId, dashboardName, purpose }: { dashboardId: string; dashboardName: string; purpose?: string | null }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6">
       <motion.div
@@ -43,20 +43,26 @@ export function EmptyState({ dashboardId, dashboardName }: { dashboardId: string
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="flex flex-col items-center gap-4 text-center max-w-sm"
       >
-        <div className="relative">
-          <div className="h-16 w-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <LayoutDashboard className="h-7 w-7 text-primary" />
-          </div>
-          <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-primary/90 flex items-center justify-center">
-            <Sparkles className="h-2.5 w-2.5 text-white" />
-          </div>
-        </div>
+        <img
+          src="/TenTen Lottie Animation Blink Smile.gif"
+          alt="TenTen"
+          className="h-24 w-24 object-contain"
+        />
         <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Ask about Dashboard {dashboardId}
+          <p className="text-xs text-muted-foreground/50 font-mono">{dashboardId}</p>
+          <h2 className="text-lg font-semibold text-foreground mt-0.5">
+            {dashboardName}
           </h2>
+          {purpose && (
+            <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
+              {purpose}
+            </p>
+          )}
           <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-            {dashboardName} is loaded. Ask any analytical question and get AI-powered insights instantly.
+            Ask any analytical question and get TenTen-powered insights instantly.
+          </p>
+          <p className="text-[11px] text-muted-foreground/40 mt-3 tracking-wide">
+            Built by the creators of TenTen
           </p>
         </div>
       </motion.div>

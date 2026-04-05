@@ -106,7 +106,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
         {/* Messages */}
         <div className="relative z-10 flex-1 overflow-y-auto">
           {isEmpty ? (
-            <EmptyState dashboardId={dashboard.dashboard_id} dashboardName={dashboard.dashboard_name} />
+            <EmptyState dashboardId={dashboard.dashboard_id} dashboardName={dashboard.dashboard_name} purpose={dashboard.purpose} />
           ) : (
             <div className="px-6 py-6 flex flex-col gap-5 max-w-3xl mx-auto w-full">
               <AnimatePresence initial={false}>
