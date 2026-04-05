@@ -70,27 +70,37 @@ function toLabel(key: string) {
   return key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-const ROTATE_THRESHOLD = 12;
+const CHAR_WIDTH_PX = 6; // approximate px width per character at font-size 10
+const ROTATE_ANGLE = -40;
 
-function AngledTick({ x, y, payload }: { x?: string | number; y?: string | number; payload?: { value: string } }) {
-  const label = payload?.value ?? "";
-  const shouldRotate = label.length > ROTATE_THRESHOLD;
-  const truncated = label.length > 18 ? label.slice(0, 18) + "…" : label;
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={shouldRotate ? 4 : 10}
-        textAnchor={shouldRotate ? "end" : "middle"}
-        fill="rgba(255,255,255,0.45)"
-        fontSize={10}
-        transform={shouldRotate ? "rotate(-40)" : undefined}
-      >
-        {truncated}
-      </text>
-    </g>
-  );
+// Returns true if any label would overlap its neighbour given the available slot width
+function wouldOverlap(data: Record<string, unknown>[], xKey: string, chartWidth = 600): boolean {
+  if (data.length === 0) return false;
+  const slotWidth = chartWidth / data.length;
+  const maxLabelWidth = Math.max(...data.map((r) => String(r[xKey] ?? "").length)) * CHAR_WIDTH_PX;
+  return maxLabelWidth > slotWidth;
+}
+
+function makeAngledTick(rotate: boolean) {
+  return function AngledTick({ x, y, payload }: { x?: string | number; y?: string | number; payload?: { value: string } }) {
+    const label = payload?.value ?? "";
+    const truncated = label.length > 20 ? label.slice(0, 20) + "…" : label;
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text
+          x={0}
+          y={0}
+          dy={rotate ? 4 : 10}
+          textAnchor={rotate ? "end" : "middle"}
+          fill="rgba(255,255,255,0.45)"
+          fontSize={10}
+          transform={rotate ? `rotate(${ROTATE_ANGLE})` : undefined}
+        >
+          {truncated}
+        </text>
+      </g>
+    );
+  };
 }
 
 function formatYAxis(value: number) {
@@ -99,9 +109,11 @@ function formatYAxis(value: number) {
   return String(value);
 }
 
-function xAxisMargin(data: Record<string, unknown>[], xKey: string | undefined): number {
-  if (!xKey) return 8;
-  return data.some((r) => String(r[xKey] ?? "").length > ROTATE_THRESHOLD) ? 60 : 8;
+function xAxisMargin(shouldRotate: boolean): { top: number; bottom: number } {
+  return {
+    top: 20, // space for top LabelList values
+    bottom: shouldRotate ? 55 : 8,
+  };
 }
 
 export function ChartBlock({ spec }: { spec: ChartSpec }) {
@@ -123,6 +135,10 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
 
   const hasMultipleSeries = (spec.y_keys?.length ?? 0) > 1;
   const chartRef = useRef<HTMLDivElement>(null);
+
+  // Compute once: should all x-axis labels rotate together?
+  const shouldRotate = spec.x_key ? wouldOverlap(spec.data, spec.x_key) : false;
+  const AngledTick = makeAngledTick(shouldRotate);
 
   // Validate required fields based on chart type
   const isInvalid =
@@ -324,7 +340,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
           </PieChart>
         ) : spec.type === "pie" ? null
         : spec.type === "line" ? (
-          <LineChart data={spec.data} margin={{ bottom: xAxisMargin(spec.data, spec.x_key) }}>
+          <LineChart data={spec.data} margin={xAxisMargin(shouldRotate)}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis
               dataKey={spec.x_key}
@@ -341,7 +357,12 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
               width={40}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
-            {hasMultipleSeries && <ChartLegend content={<ChartLegendContent />} />}
+            {hasMultipleSeries && (
+                <ChartLegend
+                  content={<ChartLegendContent />}
+                  verticalAlign={shouldRotate ? "top" : "bottom"}
+                />
+              )}
             {(spec.y_keys ?? []).map((key) => (
               <Line
                 key={key}
@@ -355,7 +376,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
             ))}
           </LineChart>
         ) : spec.type === "area" ? (
-          <AreaChart data={spec.data} margin={{ bottom: xAxisMargin(spec.data, spec.x_key) }}>
+          <AreaChart data={spec.data} margin={xAxisMargin(shouldRotate)}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis
               dataKey={spec.x_key}
@@ -372,7 +393,12 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
               width={40}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
-            {hasMultipleSeries && <ChartLegend content={<ChartLegendContent />} />}
+            {hasMultipleSeries && (
+                <ChartLegend
+                  content={<ChartLegendContent />}
+                  verticalAlign={shouldRotate ? "top" : "bottom"}
+                />
+              )}
             {(spec.y_keys ?? []).map((key) => (
               <Area
                 key={key}
@@ -386,7 +412,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
             ))}
           </AreaChart>
         ) : (
-          <BarChart data={spec.data} margin={{ bottom: xAxisMargin(spec.data, spec.x_key) }}>
+          <BarChart data={spec.data} margin={xAxisMargin(shouldRotate)}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis
               dataKey={spec.x_key}
@@ -403,7 +429,12 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
               width={40}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
-            {hasMultipleSeries && <ChartLegend content={<ChartLegendContent />} />}
+            {hasMultipleSeries && (
+                <ChartLegend
+                  content={<ChartLegendContent />}
+                  verticalAlign={shouldRotate ? "top" : "bottom"}
+                />
+              )}
             {(spec.y_keys ?? []).map((key) => (
               <Bar
                 key={key}
