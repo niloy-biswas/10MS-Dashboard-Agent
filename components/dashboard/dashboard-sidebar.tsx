@@ -70,11 +70,11 @@ interface SessionsPanelProps {
   sessions: ChatSession[];
   currentSessionNumber: number;
   dashboardUuid: string;
-  dashboardId: string;
+  dashboardShortId: string;
   profileId: string;
 }
 
-function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, profileId }: SessionsPanelProps) {
+function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboardShortId, profileId }: SessionsPanelProps) {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
 
@@ -88,7 +88,7 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, profileI
       });
       const data = await res.json();
       if (data.sessionNumber) {
-        router.push(`/chat/${dashboardUuid}/${data.sessionNumber}`);
+        router.push(`/chat/${dashboardShortId}/${data.sessionNumber}`);
       }
     } finally {
       setCreating(false);
@@ -127,7 +127,7 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, profileI
             return (
               <button
                 key={s.id}
-                onClick={() => router.push(`/chat/${dashboardUuid}/${s.session_number}`)}
+                onClick={() => router.push(`/chat/${dashboardShortId}/${s.session_number}`)}
                 className={`w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg transition-colors group ${
                   isActive
                     ? "bg-primary/12 border border-primary/20 text-foreground"
@@ -223,7 +223,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
           sessions={sessions}
           currentSessionNumber={currentSessionNumber}
           dashboardUuid={dashboard.id}
-          dashboardId={dashboard.dashboard_id}
+          dashboardShortId={dashboard.dashboard_id}
           profileId={profile.id}
         />
       )}
