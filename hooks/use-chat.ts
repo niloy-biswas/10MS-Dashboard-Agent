@@ -69,6 +69,7 @@ export function useChat(initialMessages: ChatMessage[] = []) {
           let streamedContent = "";
           let isN8nStream = false;
           let streamDone = false;
+          let needsNewline = false;
 
           while (true) {
             const { done, value } = await reader.read();
@@ -96,6 +97,9 @@ export function useChat(initialMessages: ChatMessage[] = []) {
                   const newState = nodeName.toLowerCase().includes("bigquery") || nodeName.toLowerCase().includes("sql")
                     ? "querying"
                     : "thinking";
+                  // If agent already wrote text and is now calling a tool,
+                  // mark that we need a separator before the next text chunk.
+                  if (streamedContent.trim()) needsNewline = true;
                   setMessages((prev) =>
                     prev.map((m) =>
                       m.id === assistantId
@@ -104,6 +108,10 @@ export function useChat(initialMessages: ChatMessage[] = []) {
                     )
                   );
                 } else if (chunk.type === "item" && chunk.content) {
+                  if (needsNewline) {
+                    streamedContent += "\n\n";
+                    needsNewline = false;
+                  }
                   streamedContent += chunk.content;
                   // Normalize \n and strip tool call logs for live display
                   const liveContent = streamedContent
