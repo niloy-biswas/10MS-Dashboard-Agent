@@ -96,7 +96,7 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
   };
 
   return (
-    <div className="px-3 py-3 border-b border-border/40">
+    <div className="flex-1 flex flex-col min-h-0 px-3 py-3 overflow-hidden">
       {/* Header row */}
       <div className="flex items-center justify-between mb-2 px-1">
         <p className="text-[9px] font-bold tracking-[0.12em] text-muted-foreground/50 uppercase">
@@ -118,7 +118,7 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
       </div>
 
       {/* Session list */}
-      <div className="space-y-0.5 max-h-52 overflow-y-auto pr-0.5">
+      <div className="flex-1 space-y-0.5 overflow-y-auto pr-0.5">
         {sessions.length === 0 ? (
           <p className="text-xs text-muted-foreground/50 px-2 py-2">No sessions yet</p>
         ) : (
@@ -229,7 +229,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
       )}
 
       {/* Dashboard info sections */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-2">
+      <div className="shrink-0 px-3 py-4 flex flex-col gap-2">
         {dashboard.description && (
           <SidebarSection title="Overview" icon={<Info className="h-3.5 w-3.5" />} defaultOpen>
             <p className="text-xs text-muted-foreground leading-relaxed">{dashboard.description}</p>

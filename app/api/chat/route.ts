@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
       // Auto-title session from first user message only
       const existing = await getChatHistoryBySession(payload.session_id);
-      if (existing.length === 0) {
+      if (existing.length === 1) {
         await updateSessionTitle(payload.session_id, payload.message);
       }
     }
