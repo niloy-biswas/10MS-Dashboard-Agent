@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useTheme } from "next-themes";
 import { Download } from "lucide-react";
 import {
   BarChart,
@@ -35,7 +36,7 @@ function PieLegend({ data, nameKey, valueKey, colors }: { data: Record<string, u
           <div key={i} className="flex items-center gap-1.5 min-w-0">
             <span className="shrink-0 h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: colors[i % colors.length] }} />
             <span className="text-xs text-muted-foreground truncate">{String(row[nameKey] ?? "")}</span>
-            <span className="text-xs text-white/60 font-mono shrink-0">({pct}%)</span>
+            <span className="text-xs text-muted-foreground font-mono shrink-0">({pct}%)</span>
           </div>
         );
       })}
@@ -81,7 +82,7 @@ function wouldOverlap(data: Record<string, unknown>[], xKey: string, chartWidth 
   return maxLabelWidth > slotWidth;
 }
 
-function makeAngledTick(rotate: boolean) {
+function makeAngledTick(rotate: boolean, fill: string) {
   return function AngledTick({ x, y, payload }: { x?: string | number; y?: string | number; payload?: { value: string } }) {
     const label = payload?.value ?? "";
     const truncated = label.length > 20 ? label.slice(0, 20) + "…" : label;
@@ -92,7 +93,7 @@ function makeAngledTick(rotate: boolean) {
           y={0}
           dy={rotate ? 4 : 10}
           textAnchor={rotate ? "end" : "middle"}
-          fill="rgba(255,255,255,0.45)"
+          fill={fill}
           fontSize={10}
           transform={rotate ? `rotate(${ROTATE_ANGLE})` : undefined}
         >
@@ -117,6 +118,16 @@ function xAxisMargin(shouldRotate: boolean): { top: number; bottom: number } {
 }
 
 export function ChartBlock({ spec }: { spec: ChartSpec }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme !== "light";
+  const c = {
+    grid:    isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.07)",
+    tick:    isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.5)",
+    label:   isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.7)",
+    refLine: isDark ? "rgba(255,255,255,0.2)"  : "rgba(0,0,0,0.15)",
+    pieTxt:  isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.5)",
+  };
+
   const config: ChartConfig = {};
 
   if (spec.type === "pie" && spec.value_key) {
@@ -138,7 +149,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
 
   // Compute once: should all x-axis labels rotate together?
   const shouldRotate = spec.x_key ? wouldOverlap(spec.data, spec.x_key) : false;
-  const AngledTick = makeAngledTick(shouldRotate);
+  const AngledTick = makeAngledTick(shouldRotate, c.tick);
 
   // Validate required fields based on chart type
   const isInvalid =
@@ -148,7 +159,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
 
   if (isInvalid || isPieInvalid) {
     return (
-      <div className="mt-3 mb-2 rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-xs text-muted-foreground">
+      <div className="mt-3 mb-2 rounded-xl border border-border bg-card dark:bg-white/[0.03] p-4 text-xs text-muted-foreground">
         Chart could not be rendered: missing required fields ({spec.type === "pie" ? "name_key / value_key" : "x_key / y_keys"}).
       </div>
     );
@@ -232,7 +243,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
         const name = String(row[spec.name_key!] ?? "");
         const truncated = name.length > 30 ? name.slice(0, 30) + "…" : name;
         rows.push(`<rect x="${x}" y="${y - 9}" width="9" height="9" rx="2" fill="${color}"/>`);
-        rows.push(`<text x="${x + 13}" y="${y}" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.6)">${escapeXml(truncated)} <tspan font-weight="600" fill="rgba(255,255,255,0.75)">(${pct}%)</tspan></text>`);
+        rows.push(`<text x="${x + 13}" y="${y}" font-family="Inter,sans-serif" font-size="10" fill="${c.tick}">${escapeXml(truncated)} <tspan font-weight="600" fill="${c.label}">(${pct}%)</tspan></text>`);
       });
       const numRows = Math.ceil(spec.data.length / 2);
       legendHeight = numRows * itemHeight + 16;
@@ -241,10 +252,13 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
 
     const totalHeight = svgHeight + headerHeight + legendHeight + padding;
 
+    const bgColor = isDark ? "#0e1117" : "#ffffff";
+    const titleColor = isDark ? "#ffffff" : "#0d1117";
+    const subtitleColor = isDark ? "#6b7a96" : "#64748b";
     const wrapperSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}">
-  <rect width="${totalWidth}" height="${totalHeight}" fill="#0e1117" rx="12"/>
-  <text x="${padding}" y="${padding + 14}" font-family="Inter,sans-serif" font-size="14" font-weight="600" fill="#ffffff">${escapeXml(spec.title)}</text>
-  ${spec.description ? `<text x="${padding}" y="${padding + titleLineHeight + 14}" font-family="Inter,sans-serif" font-size="11" fill="#6b7a96">${escapeXml(spec.description)}</text>` : ""}
+  <rect width="${totalWidth}" height="${totalHeight}" fill="${bgColor}" rx="12"/>
+  <text x="${padding}" y="${padding + 14}" font-family="Inter,sans-serif" font-size="14" font-weight="600" fill="${titleColor}">${escapeXml(spec.title)}</text>
+  ${spec.description ? `<text x="${padding}" y="${padding + titleLineHeight + 14}" font-family="Inter,sans-serif" font-size="11" fill="${subtitleColor}">${escapeXml(spec.description)}</text>` : ""}
   <g transform="translate(${padding},${headerHeight})">${svgClone.outerHTML}</g>
   ${legendSvg}
 </svg>`;
@@ -279,17 +293,17 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
   }
 
   return (
-    <div ref={chartRef} className="mt-3 mb-2 rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
+    <div ref={chartRef} className="mt-3 mb-2 rounded-xl border border-border bg-card dark:bg-white/[0.03] p-4">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-semibold text-white">{spec.title}</p>
+          <p className="text-sm font-semibold text-foreground">{spec.title}</p>
           {spec.description && (
             <p className="text-xs text-muted-foreground mt-0.5 mb-1">{spec.description}</p>
           )}
         </div>
         <button
           onClick={handleDownload}
-          className="p-1.5 rounded-lg text-muted-foreground hover:text-white hover:bg-white/[0.07] transition-colors shrink-0"
+          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
           title="Download chart"
         >
           <Download className="h-3.5 w-3.5" />
@@ -318,7 +332,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
                     dominantBaseline="central"
                     fontSize={11}
                     fontWeight={600}
-                    fill="rgba(255,255,255,0.75)"
+                    fill={c.label}
                   >
                     {`${(percent * 100).toFixed(1)}%`}
                   </text>
@@ -333,7 +347,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
                 const y1 = p.cy + p.outerRadius * Math.sin(-p.midAngle * RADIAN);
                 const x2 = p.cx + (p.outerRadius + 15) * Math.cos(-p.midAngle * RADIAN);
                 const y2 = p.cy + (p.outerRadius + 15) * Math.sin(-p.midAngle * RADIAN);
-                return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={p.stroke ?? "rgba(255,255,255,0.2)"} strokeWidth={1} />;
+                return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={p.stroke ?? c.refLine} strokeWidth={1} />;
               }}
             />
             <ChartTooltip content={<ChartTooltipContent nameKey={spec.name_key} />} />
@@ -341,7 +355,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
         ) : spec.type === "pie" ? null
         : spec.type === "line" ? (
           <LineChart data={spec.data} margin={xAxisMargin(shouldRotate)}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid strokeDasharray="3 3" stroke={c.grid} />
             <XAxis
               dataKey={spec.x_key}
               tick={AngledTick}
@@ -377,7 +391,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
           </LineChart>
         ) : spec.type === "area" ? (
           <AreaChart data={spec.data} margin={xAxisMargin(shouldRotate)}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid strokeDasharray="3 3" stroke={c.grid} />
             <XAxis
               dataKey={spec.x_key}
               tick={AngledTick}
@@ -413,7 +427,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
           </AreaChart>
         ) : (
           <BarChart data={spec.data} margin={xAxisMargin(shouldRotate)}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid strokeDasharray="3 3" stroke={c.grid} />
             <XAxis
               dataKey={spec.x_key}
               tick={AngledTick}
@@ -445,7 +459,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
                 <LabelList
                   dataKey={key}
                   position="top"
-                  style={{ fontSize: 10, fill: "rgba(255,255,255,0.55)" }}
+                  style={{ fontSize: 10, fill: c.tick }}
                   formatter={(v: unknown) => formatYAxis(Number(v))}
                 />
               </Bar>
