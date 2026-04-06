@@ -47,7 +47,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
               </div>
               <div>
                 <p className="text-base font-black font-mono tracking-tight bg-gradient-to-r from-[#d63031] via-[#a855b5] to-[#4c51bf] bg-clip-text text-transparent">10MS Analytics</p>
-                <p className="text-[9px] text-muted-foreground tracking-wide uppercase">Internal Intelligence</p>
+                <p className="text-xs text-muted-foreground tracking-wide uppercase">Internal Intelligence</p>
               </div>
             </div>
 
@@ -55,7 +55,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
               <div className="flex items-center gap-2">
                 <div className="text-right">
                   <p className="text-xs font-medium text-foreground">{profile.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{profile.role}</p>
+                  <p className="text-xs text-muted-foreground">{profile.role}</p>
                 </div>
                 <UserAvatar name={profile.name} avatarUrl={profile.avatar_url} size="sm" />
                 <LogoutButton />
@@ -65,7 +65,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
 
           {/* Heading */}
           <div className="mb-6 text-center">
-            <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 text-[11px] text-primary font-medium mb-3">
+            <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 text-xs text-primary font-medium mb-3">
               <Sparkles className="h-3 w-3" />
               TenTen-Powered Analytics
             </div>
@@ -88,10 +88,10 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
 
         {/* Footer */}
         <div className="px-8 py-4 border-t border-border/40 flex items-center justify-between mt-2">
-          <p className="text-[10px] text-muted-foreground/50">
+          <p className="text-xs text-muted-foreground/50">
             {dashboards.length} dashboard{dashboards.length !== 1 ? "s" : ""} available
           </p>
-          <p className="text-[10px] text-muted-foreground/40 font-mono">10MS · Internal Only</p>
+          <p className="text-xs text-muted-foreground/40 font-mono">10MS · Internal Only</p>
         </div>
       </motion.div>
     </main>

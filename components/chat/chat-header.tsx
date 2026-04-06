@@ -19,7 +19,7 @@ export function ChatHeader({ dashboard, sessionNumber, sessionTitle }: ChatHeade
         </div>
         <div>
           <p className="text-sm font-semibold text-foreground leading-none">{dashboard.dashboard_name}</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {sessionNumber !== undefined ? (
               <span>Session #{sessionNumber}{sessionTitle && sessionTitle !== "New Chat" ? ` · ${sessionTitle.slice(0, 30)}` : ""}</span>
             ) : dashboard.vertical}
@@ -61,7 +61,7 @@ export function EmptyState({ dashboardId, dashboardName, purpose }: { dashboardI
           <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
             Ask any analytical question and get TenTen-powered insights instantly.
           </p>
-          <p className="text-[11px] text-muted-foreground/40 mt-3 tracking-wide">
+          <p className="text-xs text-muted-foreground/40 mt-3 tracking-wide">
             Built by the creators of TenTen
           </p>
         </div>

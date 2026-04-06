@@ -34,8 +34,8 @@ function PieLegend({ data, nameKey, valueKey, colors }: { data: Record<string, u
         return (
           <div key={i} className="flex items-center gap-1.5 min-w-0">
             <span className="shrink-0 h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: colors[i % colors.length] }} />
-            <span className="text-[11px] text-muted-foreground truncate">{String(row[nameKey] ?? "")}</span>
-            <span className="text-[11px] text-white/60 font-mono shrink-0">({pct}%)</span>
+            <span className="text-xs text-muted-foreground truncate">{String(row[nameKey] ?? "")}</span>
+            <span className="text-xs text-white/60 font-mono shrink-0">({pct}%)</span>
           </div>
         );
       })}

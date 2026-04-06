@@ -99,14 +99,14 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
     <div className="flex-1 flex flex-col min-h-0 px-3 py-3 overflow-hidden">
       {/* Header row */}
       <div className="flex items-center justify-between mb-2 px-1">
-        <p className="text-[9px] font-bold tracking-[0.12em] text-muted-foreground/50 uppercase">
+        <p className="text-xs font-bold tracking-[0.12em] text-muted-foreground/50 uppercase">
           Chat History
         </p>
         <button
           onClick={handleNewChat}
           disabled={creating}
           title="New Chat"
-          className="flex items-center gap-1 text-[10px] font-medium text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/15 border border-primary/20 rounded-full px-2.5 py-1 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/15 border border-primary/20 rounded-full px-2.5 py-1 transition-colors disabled:opacity-50"
         >
           {creating ? (
             <span className="h-2.5 w-2.5 rounded-full border border-primary/50 border-t-primary animate-spin" />
@@ -141,7 +141,7 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
                       <span className="text-muted-foreground/60">New Chat</span>
                     ) : s.title}
                   </span>
-                  <span className={`text-[10px] ${isActive ? "text-primary/60" : "text-muted-foreground/40"}`}>
+                  <span className={`text-xs ${isActive ? "text-primary/60" : "text-muted-foreground/40"}`}>
                     #{s.session_number}
                   </span>
                 </span>
@@ -177,14 +177,14 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
           </div>
           <div>
             <p className="text-xs font-bold text-foreground tracking-wide">10MS ANALYTICS</p>
-            <p className="text-[10px] text-muted-foreground">Internal Intelligence</p>
+            <p className="text-xs text-muted-foreground">Internal Intelligence</p>
           </div>
         </div>
       </div>
 
       {/* Active dashboard info */}
       <div className="px-4 py-4 border-b border-border/40">
-        <p className="text-[9px] font-bold tracking-[0.12em] text-muted-foreground/50 uppercase mb-2">
+        <p className="text-xs font-bold tracking-[0.12em] text-muted-foreground/50 uppercase mb-2">
           Active Dashboard
         </p>
         <div className="flex items-start gap-3">
@@ -198,7 +198,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
         </div>
         <div className="flex flex-wrap gap-1.5 mt-3">
           {dashboard.refresh_window && (
-            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 rounded-full px-2 py-0.5">
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted/60 rounded-full px-2 py-0.5">
               <Clock className="h-2.5 w-2.5" />
               {dashboard.refresh_window}
             </span>
@@ -208,7 +208,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
               href={dashboard.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 bg-primary/10 rounded-full px-2 py-0.5 transition-colors"
+              className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 bg-primary/10 rounded-full px-2 py-0.5 transition-colors"
             >
               <ExternalLink className="h-2.5 w-2.5" />
               View
@@ -245,7 +245,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
           <SidebarSection title="Available Metrics" icon={<BarChart2 className="h-3.5 w-3.5" />}>
             <div className="flex flex-wrap gap-1.5 pt-1">
               {dashboard.available_metrics.map((m) => (
-                <span key={m} className="text-[10px] bg-accent text-accent-foreground rounded-full px-2 py-0.5 border border-border/50">{m}</span>
+                <span key={m} className="text-xs bg-accent text-accent-foreground rounded-full px-2 py-0.5 border border-border/50">{m}</span>
               ))}
             </div>
           </SidebarSection>
@@ -254,7 +254,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
           <SidebarSection title="Available Filters" icon={<Filter className="h-3.5 w-3.5" />}>
             <div className="flex flex-wrap gap-1.5 pt-1">
               {dashboard.available_filters.map((f) => (
-                <span key={f} className="text-[10px] bg-muted text-muted-foreground rounded-full px-2 py-0.5 border border-border/50">{f}</span>
+                <span key={f} className="text-xs bg-muted text-muted-foreground rounded-full px-2 py-0.5 border border-border/50">{f}</span>
               ))}
             </div>
           </SidebarSection>
