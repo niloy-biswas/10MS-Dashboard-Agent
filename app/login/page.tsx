@@ -113,7 +113,7 @@ export default function LoginPage() {
               <p className="text-2xl font-black tracking-tight text-center font-mono bg-gradient-to-r from-[#d63031] via-[#a855b5] to-[#4c51bf] bg-clip-text text-transparent">
                 10MS Analytics
               </p>
-              <p className="text-[10px] text-muted-foreground tracking-widest text-center uppercase">
+              <p className="text-xs text-muted-foreground tracking-widest text-center uppercase">
                 Internal Intelligence
               </p>
             </motion.div>
@@ -158,7 +158,7 @@ export default function LoginPage() {
 
               <div className="flex items-center gap-3 mt-5">
                 <div className="flex-1 h-px bg-border/40" />
-                <span className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.12em]">
+                <span className="text-xs text-muted-foreground/50 uppercase tracking-[0.12em]">
                   or
                 </span>
                 <div className="flex-1 h-px bg-border/40" />
@@ -186,7 +186,7 @@ export default function LoginPage() {
               className="space-y-4"
             >
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-[0.12em]">
                   Email
                 </label>
                 <input
@@ -201,7 +201,7 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-[0.12em]">
                   Password
                 </label>
                 <div className="relative">
@@ -256,14 +256,14 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
-            <p className="text-[10px] text-muted-foreground/30 tracking-wide">
+            <p className="text-xs text-muted-foreground/30 tracking-wide">
               Built by the creators of TenTen
             </p>
           </div>
         </div>
 
         {/* Bottom badge */}
-        <p className="text-center text-[10px] text-muted-foreground/40 mt-5 tracking-wider uppercase">
+        <p className="text-center text-xs text-muted-foreground/40 mt-5 tracking-wider uppercase">
           Restricted to @10minuteschool.com accounts
         </p>
 

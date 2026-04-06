@@ -79,14 +79,14 @@ function DownloadableTable({ children }: { children: React.ReactNode }) {
       <div className="flex justify-end gap-1.5 mb-1 opacity-0 group-hover/table:opacity-100 transition-opacity">
         <button
           onClick={downloadCSV}
-          className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] text-muted-foreground hover:text-white hover:bg-white/[0.07] transition-colors border border-white/[0.06]"
+          className="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-muted-foreground hover:text-white hover:bg-white/[0.07] transition-colors border border-white/[0.06]"
         >
           <FileDown className="h-3 w-3" />
           CSV
         </button>
         <button
           onClick={downloadExcel}
-          className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] text-muted-foreground hover:text-white hover:bg-white/[0.07] transition-colors border border-white/[0.06]"
+          className="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-muted-foreground hover:text-white hover:bg-white/[0.07] transition-colors border border-white/[0.06]"
         >
           <FileDown className="h-3 w-3" />
           Excel

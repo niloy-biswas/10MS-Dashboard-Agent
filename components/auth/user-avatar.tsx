@@ -17,7 +17,7 @@ export function UserAvatar({ name, avatarUrl, size = "md" }: UserAvatarProps) {
     .slice(0, 2);
 
   const dimension = size === "sm" ? 28 : 32;
-  const textClass = size === "sm" ? "text-[10px]" : "text-xs";
+  const textClass = size === "sm" ? "text-xs" : "text-xs";
   const sizeClass = size === "sm" ? "h-7 w-7" : "h-8 w-8";
 
   if (avatarUrl) {

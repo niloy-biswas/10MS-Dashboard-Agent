@@ -74,7 +74,7 @@ export function ChatInput({ onSend, isStreaming, placeholder = "Ask a question..
           </motion.button>
         </AnimatePresence>
       </div>
-      <p className="text-[10px] text-muted-foreground/50 mt-2 text-center">
+      <p className="text-xs text-muted-foreground/50 mt-2 text-center">
         Press Enter to send · Shift+Enter for new line
       </p>
     </div>

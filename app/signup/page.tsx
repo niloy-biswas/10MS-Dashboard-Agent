@@ -146,7 +146,7 @@ export default function SignupPage() {
               <p className="text-2xl font-black tracking-tight text-center font-mono bg-gradient-to-r from-[#d63031] via-[#a855b5] to-[#4c51bf] bg-clip-text text-transparent">
                 10MS Analytics
               </p>
-              <p className="text-[10px] text-muted-foreground tracking-widest text-center uppercase">
+              <p className="text-xs text-muted-foreground tracking-widest text-center uppercase">
                 Internal Intelligence
               </p>
             </motion.div>
@@ -188,13 +188,13 @@ export default function SignupPage() {
                   </>
                 )}
               </button>
-              <p className="text-[10px] text-muted-foreground/50 text-center mt-2">
+              <p className="text-xs text-muted-foreground/50 text-center mt-2">
                 Name and photo are pulled from your Google account automatically
               </p>
 
               <div className="flex items-center gap-3 mt-4">
                 <div className="flex-1 h-px bg-border/40" />
-                <span className="text-[10px] text-muted-foreground/50 uppercase tracking-[0.12em]">
+                <span className="text-xs text-muted-foreground/50 uppercase tracking-[0.12em]">
                   or sign up with email
                 </span>
                 <div className="flex-1 h-px bg-border/40" />
@@ -223,7 +223,7 @@ export default function SignupPage() {
             >
               {/* Name */}
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-[0.12em]">
                   Full Name
                 </label>
                 <input
@@ -239,7 +239,7 @@ export default function SignupPage() {
 
               {/* Email */}
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-[0.12em]">
                   Work Email
                 </label>
                 <div className="relative">
@@ -269,7 +269,7 @@ export default function SignupPage() {
                   )}
                 </div>
                 {showDomainFeedback && !isValidDomain && (
-                  <p className="text-[11px] text-destructive/80 mt-1">
+                  <p className="text-xs text-destructive/80 mt-1">
                     Must be a @10minuteschool.com address
                   </p>
                 )}
@@ -277,7 +277,7 @@ export default function SignupPage() {
 
               {/* Password */}
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-[0.12em]">
                   Password
                 </label>
                 <div className="relative">
@@ -332,13 +332,13 @@ export default function SignupPage() {
                 Sign in
               </Link>
             </p>
-            <p className="text-[10px] text-muted-foreground/30 tracking-wide">
+            <p className="text-xs text-muted-foreground/30 tracking-wide">
               Built by the creators of TenTen
             </p>
           </div>
         </div>
 
-        <p className="text-center text-[10px] text-muted-foreground/40 mt-5 tracking-wider uppercase">
+        <p className="text-center text-xs text-muted-foreground/40 mt-5 tracking-wider uppercase">
           Restricted to @10minuteschool.com accounts
         </p>
 
