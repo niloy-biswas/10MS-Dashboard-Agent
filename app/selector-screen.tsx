@@ -6,6 +6,7 @@ import { BarChart2, Sparkles } from "lucide-react";
 import { DashboardSelector } from "@/components/dashboard/dashboard-selector";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { Dashboard, Profile } from "@/lib/types";
 
 interface SelectorScreenProps {
@@ -21,7 +22,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
   };
 
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Ambient glow background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-primary/5 blur-[120px]" />
@@ -42,7 +43,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
           {/* Brand + profile row */}
           <div className="flex items-center justify-between mb-7">
             <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_14px_rgba(229,57,53,0.4)]">
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_14px_var(--primary-glow)]">
                 <BarChart2 className="h-4 w-4 text-white" />
               </div>
               <div>
@@ -51,16 +52,19 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
               </div>
             </div>
 
-            {profile && (
-              <div className="flex items-center gap-2">
-                <div className="text-right">
-                  <p className="text-xs font-medium text-foreground">{profile.name}</p>
-                  <p className="text-xs text-muted-foreground">{profile.role}</p>
-                </div>
-                <UserAvatar name={profile.name} avatarUrl={profile.avatar_url} size="sm" />
-                <LogoutButton />
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {profile && (
+                <>
+                  <div className="text-right">
+                    <p className="text-xs font-medium text-foreground">{profile.name}</p>
+                    <p className="text-xs text-muted-foreground">{profile.role}</p>
+                  </div>
+                  <UserAvatar name={profile.name} avatarUrl={profile.avatar_url} size="sm" />
+                  <LogoutButton />
+                </>
+              )}
+              <ThemeToggle />
+            </div>
           </div>
 
           {/* Heading */}
