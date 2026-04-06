@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +25,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
   const { messages, isStreaming, error, sendMessage } = useChat(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
   const prevMessageCountRef = useRef(messages.length);
+  const [localSessions, setLocalSessions] = useState<ChatSession[]>(sessions);
 
   useEffect(() => {
     const isNewMessage = messages.length !== prevMessageCountRef.current;
@@ -35,6 +36,12 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
   }, [messages]);
 
   const handleSend = (text: string) => {
+    // Optimistically update sidebar title on first message
+    if (messages.length === 0) {
+      setLocalSessions((prev) =>
+        prev.map((s) => s.id === session.id ? { ...s, title: text.slice(0, 60) } : s)
+      );
+    }
     sendMessage({
       session_id: session.id,
       dashboard_id: dashboard.id,
@@ -55,7 +62,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
       <DashboardSidebar
         dashboard={dashboard}
         profile={profile}
-        sessions={sessions}
+        sessions={localSessions}
         currentSessionNumber={session.session_number}
       />
 
