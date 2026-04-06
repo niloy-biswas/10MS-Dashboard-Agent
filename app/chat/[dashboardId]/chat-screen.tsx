@@ -57,7 +57,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#080a0f" }}>
+    <div className="flex h-screen overflow-hidden dark:bg-[#080a0f]">
       {/* Sidebar */}
       <DashboardSidebar
         dashboard={dashboard}
@@ -69,22 +69,21 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 relative">
 
-        {/* Gradient background with ambient glows */}
+        {/* Background: dark gradient + glows / light: transparent (body gradient shows) */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 hidden dark:block"
             style={{ background: "linear-gradient(160deg, #0d1120 0%, #090b14 45%, #080a0f 100%)" }}
           />
           <div className="absolute -top-20 right-1/3 w-[500px] h-[400px] rounded-full bg-primary/[0.07] blur-[120px]" />
           <div className="absolute bottom-1/4 -left-10 w-[400px] h-[400px] rounded-full bg-[#4f8ef7]/[0.06] blur-[110px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-[#1a1f3a]/30 blur-[80px]" />
         </div>
 
         {/* Header */}
-        <div className="relative z-10 flex items-center border-b border-white/[0.06] bg-black/20 backdrop-blur-md">
+        <div className="relative z-10 flex items-center border-b border-border bg-card/80 backdrop-blur-md">
           <button
             onClick={() => router.push("/")}
-            className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors border-r border-white/[0.06]"
+            className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border-r border-border"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
