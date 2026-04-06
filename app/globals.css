@@ -47,45 +47,46 @@
   --radius-2xl: calc(var(--radius) * 1.8);
 }
 
-/* Always dark theme — 10MS internal tool */
+/* Light theme (default) */
 :root {
-  --background: #080a0f;
-  --foreground: #e8eaf0;
-  --card: #0e1117;
-  --card-foreground: #e8eaf0;
-  --popover: #0e1117;
-  --popover-foreground: #e8eaf0;
-  --primary: #e53935;
+  --background: #d6e5f8;
+  --foreground: #0d1117;
+  --card: rgba(255, 255, 255, 0.65);
+  --card-foreground: #0d1117;
+  --popover: rgba(255, 255, 255, 0.90);
+  --popover-foreground: #0d1117;
+  --primary: #3b6fd4;
   --primary-foreground: #ffffff;
-  --secondary: #161b26;
-  --secondary-foreground: #b8c4d8;
-  --muted: #161b26;
-  --muted-foreground: #8c9ab5;
-  --accent: #1e2535;
-  --accent-foreground: #c5cfe0;
+  --secondary: rgba(238, 241, 248, 0.7);
+  --secondary-foreground: #1e2a3a;
+  --muted: rgba(238, 241, 248, 0.7);
+  --muted-foreground: #64748b;
+  --accent: rgba(232, 237, 248, 0.8);
+  --accent-foreground: #1e2a3a;
   --destructive: #e53935;
-  --border: rgba(255, 255, 255, 0.10);
-  --input: rgba(255, 255, 255, 0.06);
-  --ring: rgba(229, 57, 53, 0.4);
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(255, 255, 255, 0.6);
+  --ring: rgba(59, 111, 212, 0.35);
   --radius: 0.75rem;
-  --sidebar: #0b0d14;
-  --sidebar-foreground: #c5cfe0;
-  --sidebar-primary: #e53935;
+  --sidebar: rgba(255, 255, 255, 0.55);
+  --sidebar-foreground: #1e2a3a;
+  --sidebar-primary: #3b6fd4;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #161b26;
-  --sidebar-accent-foreground: #a0aabb;
-  --sidebar-accent-foreground: #b8c4d8;
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: rgba(229, 57, 53, 0.3);
+  --sidebar-accent: #f0f3fb;
+  --sidebar-accent-foreground: #4a5568;
+  --sidebar-border: rgba(0, 0, 0, 0.07);
+  --sidebar-ring: rgba(59, 111, 212, 0.25);
+  --primary-glow: rgba(59, 111, 212, 0.4);
 
   /* 10MS brand colors */
   --10ms-red: #e53935;
-  --10ms-red-glow: rgba(229, 57, 53, 0.25);
+  --10ms-red-glow: rgba(229, 57, 53, 0.2);
   --10ms-blue: #4f8ef7;
-  --10ms-blue-glow: rgba(79, 142, 247, 0.2);
+  --10ms-blue-glow: rgba(79, 142, 247, 0.15);
+  --grid-line: rgba(0, 0, 0, 0.06);
 }
 
-/* We always use dark mode */
+/* Dark theme */
 .dark {
   --background: #080a0f;
   --foreground: #e8eaf0;
@@ -110,10 +111,17 @@
   --sidebar-primary: #e53935;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #161b26;
-  --sidebar-accent-foreground: #a0aabb;
   --sidebar-accent-foreground: #b8c4d8;
   --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: rgba(229, 57, 53, 0.3);
+  --primary-glow: rgba(229, 57, 53, 0.4);
+
+  /* 10MS brand colors */
+  --10ms-red: #e53935;
+  --10ms-red-glow: rgba(229, 57, 53, 0.25);
+  --10ms-blue: #4f8ef7;
+  --10ms-blue-glow: rgba(79, 142, 247, 0.2);
+  --grid-line: rgba(255, 255, 255, 0.025);
 }
 
 @layer base {
@@ -121,10 +129,30 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased font-sans;
+    @apply text-foreground antialiased font-sans;
     font-size: 14px;
     letter-spacing: -0.01em;
     font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+    background-color: var(--background);
+  }
+
+  /* Light mode: cornflower blue gradient */
+  html:not(.dark) body {
+    background: linear-gradient(160deg, #aec6e8 0%, #c2d5f0 25%, #d6e5f8 55%, #e8f0fb 100%);
+    background-attachment: fixed;
+  }
+
+  /* Dark mode: deep navy gradient */
+  html.dark body {
+    background: linear-gradient(160deg, #0d1120 0%, #090b14 45%, #080a0f 100%);
+    background-attachment: fixed;
+  }
+
+  /* Glass backdrop for sidebar and cards in light mode only */
+  html:not(.dark) aside,
+  html:not(.dark) .bg-card {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 }
 
@@ -159,7 +187,7 @@
 
 /* Glow utilities */
 .glow-red {
-  box-shadow: 0 0 20px rgba(229, 57, 53, 0.15), 0 0 40px rgba(229, 57, 53, 0.05);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 .glow-blue {
   box-shadow: 0 0 20px rgba(79, 142, 247, 0.15), 0 0 40px rgba(79, 142, 247, 0.05);

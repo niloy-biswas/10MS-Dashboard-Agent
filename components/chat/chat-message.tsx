@@ -79,21 +79,21 @@ function DownloadableTable({ children }: { children: React.ReactNode }) {
       <div className="flex justify-end gap-1.5 mb-1 opacity-0 group-hover/table:opacity-100 transition-opacity">
         <button
           onClick={downloadCSV}
-          className="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-muted-foreground hover:text-white hover:bg-white/[0.07] transition-colors border border-white/[0.06]"
+          className="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border"
         >
           <FileDown className="h-3 w-3" />
           CSV
         </button>
         <button
           onClick={downloadExcel}
-          className="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-muted-foreground hover:text-white hover:bg-white/[0.07] transition-colors border border-white/[0.06]"
+          className="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border"
         >
           <FileDown className="h-3 w-3" />
           Excel
         </button>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-xs">{children}</table>
+        <table className="w-full border-collapse text-xs rounded-lg overflow-hidden border border-border">{children}</table>
       </div>
     </div>
   );
@@ -204,28 +204,22 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
     >
       {/* Bubble */}
       {isUser ? (
-        /* ── User: same glass, right-aligned ── */
-        <div
-          className="max-w-[72%] px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed text-[#dde3f0]
-            bg-white/[0.07] backdrop-blur-md
-            border border-white/[0.09]"
-        >
+        /* ── User bubble ── */
+        <div className="max-w-[72%] px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed text-foreground bg-white/55 backdrop-blur-md dark:bg-white/[0.07] border border-white/70 dark:border-white/[0.09]">
           <span className={message.isStreaming ? "streaming-cursor" : ""}>
             {message.content}
           </span>
         </div>
       ) : (
-        /* ── Assistant: glass card, full width ── */
+        /* ── Assistant card ── */
         <div
-          className={`w-full rounded-2xl rounded-bl-sm px-5 py-4 text-sm leading-[1.75] text-[#dde3f0]
-            bg-white/[0.05] backdrop-blur-md
-            border border-white/[0.08]
+          className={`w-full rounded-2xl rounded-bl-sm px-5 py-4 text-sm leading-[1.75] text-foreground
+            bg-white/55 backdrop-blur-md dark:bg-white/[0.05] border border-white/70 dark:border-white/[0.08]
             ${message.isStreaming && message.content.length > 0 ? "streaming-cursor" : ""}`}
         >
           {message.content.length === 0 && message.isStreaming ? (
             <ThinkingIndicator state={message.thinkingState === "querying" ? "querying" : "thinking"} />
           ) : message.isStreaming ? (
-            /* During streaming: plain pre-wrap text, no re-parsing on every token */
             <div className="whitespace-pre-wrap break-words">{message.content}</div>
           ) : (
             <div className="overflow-x-auto">
@@ -241,15 +235,15 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
                         <DownloadableTable>{children}</DownloadableTable>
                       ),
                       thead: ({ children }) => (
-                        <thead className="bg-white/[0.04]">{children}</thead>
+                        <thead className="bg-primary/10 dark:bg-white/[0.06]">{children}</thead>
                       ),
                       th: ({ children }) => (
-                        <th className="border border-white/10 px-3 py-2 text-left font-semibold whitespace-nowrap text-foreground">
+                        <th className="border-b-2 border-primary/20 dark:border-white/10 px-3 py-2 text-left font-semibold whitespace-nowrap text-foreground">
                           {children}
                         </th>
                       ),
                       td: ({ children }) => (
-                        <td className="border border-white/[0.07] px-3 py-1.5 align-top text-foreground/70">
+                        <td className="border-b border-border px-3 py-2 align-top text-foreground/80">
                           {children}
                         </td>
                       ),
@@ -258,27 +252,27 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
                       ol: ({ children }) => <ol className="list-decimal pl-4 my-1.5 space-y-0.5">{children}</ol>,
                       li: ({ children }) => <li className="my-0">{children}</li>,
                       strong: ({ children }) => (
-                        <strong className="font-semibold text-white">{children}</strong>
+                        <strong className="font-semibold text-foreground">{children}</strong>
                       ),
                       code: ({ children }) => (
-                        <code className="bg-white/[0.08] border border-white/10 rounded px-1.5 py-0.5 text-xs font-mono text-foreground/80">
+                        <code className="bg-muted border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground/80">
                           {children}
                         </code>
                       ),
                       pre: ({ children }) => (
-                        <pre className="bg-white/[0.06] border border-white/10 rounded-xl p-3 overflow-x-auto text-xs my-2">
+                        <pre className="bg-muted border border-border rounded-xl p-3 overflow-x-auto text-xs my-2">
                           {children}
                         </pre>
                       ),
-                      h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1.5 text-white">{children}</h1>,
-                      h2: ({ children }) => <h2 className="text-sm font-bold mt-3 mb-1.5 text-white">{children}</h2>,
-                      h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1 text-white/90">{children}</h3>,
+                      h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1.5 text-foreground">{children}</h1>,
+                      h2: ({ children }) => <h2 className="text-sm font-bold mt-3 mb-1.5 text-foreground">{children}</h2>,
+                      h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1 text-foreground/90">{children}</h3>,
                       blockquote: ({ children }) => (
                         <blockquote className="border-l-2 border-primary/50 pl-3 text-foreground/60 italic my-2">
                           {children}
                         </blockquote>
                       ),
-                      hr: () => <hr className="border-white/10 my-3" />,
+                      hr: () => <hr className="border-border my-3" />,
                     }}
                   >
                     {part.content}

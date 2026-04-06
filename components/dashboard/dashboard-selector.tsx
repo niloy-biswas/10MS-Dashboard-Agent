@@ -40,7 +40,7 @@ export function DashboardListItem({ dashboard, isSelected, onSelect }: Dashboard
       onClick={() => onSelect(dashboard)}
       className={`w-full text-left rounded-xl px-4 py-3.5 transition-all duration-200 border group flex items-center gap-4 ${
         isSelected
-          ? "bg-primary/10 border-primary/40 glow-red"
+          ? "bg-primary/10 border-primary/60 ring-1 ring-primary/30"
           : "bg-secondary/40 border-border hover:bg-accent hover:border-accent-foreground/10"
       }`}
       whileHover={{ scale: 1.005 }}
@@ -147,7 +147,7 @@ export function DashboardSelector({ dashboards, onSelect }: DashboardSelectorPro
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             onClick={() => onSelect(selected)}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl py-3 text-sm transition-all glow-red flex items-center justify-center gap-2"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2"
           >
             Open Dashboard {selected.dashboard_id}
             <ChevronRight className="h-4 w-4" />

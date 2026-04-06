@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleIcon } from "@/components/auth/google-icon";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -97,14 +98,17 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
+    <main className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       {/* Grid texture */}
       <div
         className="pointer-events-none absolute inset-0 opacity-40"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)
+            linear-gradient(var(--grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)
           `,
           backgroundSize: "48px 48px",
         }}
