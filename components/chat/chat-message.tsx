@@ -219,8 +219,6 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
         >
           {message.content.length === 0 && message.isStreaming ? (
             <ThinkingIndicator state={message.thinkingState === "querying" ? "querying" : "thinking"} />
-          ) : message.isStreaming ? (
-            <div className="whitespace-pre-wrap break-words">{message.content}</div>
           ) : (
             <div className="overflow-x-auto">
               {parseContentParts(message.content).map((part, i) =>
