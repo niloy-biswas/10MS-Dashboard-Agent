@@ -88,7 +88,11 @@ export default function SignupPage() {
     });
 
     if (signInError) {
-      setError(signInError.message);
+      if (signInError.message.toLowerCase().includes("email not confirmed")) {
+        setError("Account created! Please check your email and confirm your address before signing in.");
+      } else {
+        setError(signInError.message);
+      }
       setLoading(false);
       return;
     }

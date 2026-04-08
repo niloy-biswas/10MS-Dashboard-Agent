@@ -48,7 +48,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
               </div>
               <div>
                 <p className="text-base font-black font-mono tracking-tight bg-gradient-to-r from-[#d63031] via-[#a855b5] to-[#4c51bf] bg-clip-text text-transparent">10MS Analytics</p>
-                <p className="text-xs text-muted-foreground tracking-wide uppercase">Internal Intelligence</p>
+                <p className="text-xs text-muted-foreground">Internal Intelligence</p>
               </div>
             </div>
 

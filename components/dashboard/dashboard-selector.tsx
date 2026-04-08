@@ -88,6 +88,7 @@ interface DashboardSelectorProps {
 export function DashboardSelector({ dashboards, onSelect }: DashboardSelectorProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Dashboard | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const filtered = dashboards.filter((d) => {
     const q = query.toLowerCase();
@@ -146,11 +147,21 @@ export function DashboardSelector({ dashboards, onSelect }: DashboardSelectorPro
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
-            onClick={() => onSelect(selected)}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2"
+            onClick={() => { setLoading(true); onSelect(selected); }}
+            disabled={loading}
+            className="w-full bg-primary hover:bg-primary/90 disabled:opacity-80 disabled:cursor-not-allowed text-primary-foreground font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2"
           >
-            Open Dashboard {selected.dashboard_id}
-            <ChevronRight className="h-4 w-4" />
+            {loading ? (
+              <>
+                <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                Opening...
+              </>
+            ) : (
+              <>
+                Open Dashboard {selected.dashboard_id}
+                <ChevronRight className="h-4 w-4" />
+              </>
+            )}
           </motion.button>
         )}
       </AnimatePresence>
