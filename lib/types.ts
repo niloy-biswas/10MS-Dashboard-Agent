@@ -40,6 +40,8 @@ export interface ChatSession {
   dashboard_id: string;
   session_number: number;
   title: string;
+  is_shared: boolean;
+  share_token: string;
   created_at: string;
   updated_at: string;
 }

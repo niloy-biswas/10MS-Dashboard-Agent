@@ -257,6 +257,28 @@ export async function saveChatMessageToSession(
   return data.id;
 }
 
+export async function toggleSessionSharing(sessionId: string, isShared: boolean): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("chat_sessions")
+    .update({ is_shared: isShared, updated_at: new Date().toISOString() })
+    .eq("id", sessionId)
+    .select("share_token")
+    .single();
+  if (error) return null;
+  return data.share_token;
+}
+
+export async function getSessionByShareToken(token: string): Promise<ChatSession | null> {
+  const { data, error } = await supabase
+    .from("chat_sessions")
+    .select("*")
+    .eq("share_token", token)
+    .eq("is_shared", true)
+    .single();
+  if (error) return null;
+  return data as ChatSession;
+}
+
 export async function updateSessionTitle(sessionId: string, title: string): Promise<void> {
   await supabase
     .from("chat_sessions")

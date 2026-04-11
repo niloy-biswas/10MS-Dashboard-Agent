@@ -102,8 +102,10 @@ export async function GET(request: NextRequest) {
       .eq("email", email);
   }
 
-  // Build the redirect and stamp all session cookies onto it directly
-  const response = NextResponse.redirect(`${origin}/`);
+  // Redirect to ?next= if provided, otherwise home
+  const next = searchParams.get("next");
+  const destination = next ? `${origin}${next}` : `${origin}/`;
+  const response = NextResponse.redirect(destination);
   cookiesToApply.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2]);
   });

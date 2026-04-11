@@ -19,7 +19,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Read ?error= set by the OAuth callback without needing useSearchParams
     const params = new URLSearchParams(window.location.search);
     const urlError = params.get("error");
     if (urlError) setError(decodeURIComponent(urlError));
@@ -28,11 +27,13 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setError(null);
     setGoogleLoading(true);
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next") ?? "";
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`,
         queryParams: { hd: "10minuteschool.com" },
       },
     });
