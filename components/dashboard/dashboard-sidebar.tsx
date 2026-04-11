@@ -7,7 +7,6 @@ import { ChevronDown, BarChart2, Filter, Info, ExternalLink, Clock, Plus, Messag
 import Image from "next/image";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { Dashboard, Profile, ChatSession } from "@/lib/types";
 
 // ── Collapsible section ──────────────────────────────────
@@ -171,18 +170,15 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
   return (
     <aside className="w-64 shrink-0 h-screen bg-sidebar border-r border-sidebar-border flex flex-col overflow-hidden">
       {/* Brand */}
-      <div className="px-5 py-4 border-b border-border/40">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="h-7 w-7 rounded-lg overflow-hidden shrink-0">
-              <Image src="/10ms-logo.png" alt="10MS" width={28} height={28} className="object-cover w-full h-full" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-foreground tracking-wide">10MS ANALYTICS</p>
-              <p className="text-xs text-muted-foreground">Internal Intelligence</p>
-            </div>
+      <div className="px-5 py-5 border-b border-border/40">
+        <div className="flex items-center gap-2.5">
+          <div className="h-7 w-7 rounded-lg overflow-hidden shrink-0">
+            <Image src="/10ms-logo.png" alt="10MS" width={28} height={28} className="object-cover w-full h-full" />
           </div>
-          <ThemeToggle />
+          <div>
+            <p className="text-xs font-bold text-foreground tracking-wide">10MS ANALYTICS</p>
+            <p className="text-xs text-muted-foreground">Internal Intelligence</p>
+          </div>
         </div>
       </div>
 
