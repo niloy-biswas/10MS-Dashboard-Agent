@@ -30,6 +30,8 @@ export interface ChatMessage {
   isStreaming?: boolean;
   hasError?: boolean;
   thinkingState?: "thinking" | "querying" | null;
+  reaction?: "liked" | "disliked" | null;
+  feedback?: string | null;
 }
 
 export interface ChatSession {

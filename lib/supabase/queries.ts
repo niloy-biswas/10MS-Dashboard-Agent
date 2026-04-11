@@ -232,6 +232,8 @@ export async function getChatHistoryBySession(sessionId: string): Promise<ChatMe
     content: row.content,
     metadata: row.metadata,
     createdAt: row.created_at,
+    reaction: row.reaction ?? null,
+    feedback: row.feedback ?? null,
   }));
 }
 
@@ -242,16 +244,17 @@ export async function saveChatMessageToSession(
   role: "user" | "assistant",
   content: string,
   metadata?: Record<string, any>
-): Promise<boolean> {
-  const { error } = await supabase.from("chat_messages").insert({
+): Promise<string | null> {
+  const { data, error } = await supabase.from("chat_messages").insert({
     session_id: sessionId,
     dashboard_id: dashboardId,
     profile_id: profileId,
     role,
     content,
     metadata,
-  });
-  return !error;
+  }).select("id").single();
+  if (error) return null;
+  return data.id;
 }
 
 export async function updateSessionTitle(sessionId: string, title: string): Promise<void> {
@@ -259,6 +262,18 @@ export async function updateSessionTitle(sessionId: string, title: string): Prom
     .from("chat_sessions")
     .update({ title: title.slice(0, 60), updated_at: new Date().toISOString() })
     .eq("id", sessionId);
+}
+
+export async function saveMessageReaction(
+  messageId: string,
+  reaction: "liked" | "disliked",
+  feedback?: string
+): Promise<boolean> {
+  const { error } = await supabase
+    .from("chat_messages")
+    .update({ reaction, feedback: feedback ?? null })
+    .eq("id", messageId);
+  return !error;
 }
 
 export async function clearSessionMessages(sessionId: string): Promise<boolean> {
