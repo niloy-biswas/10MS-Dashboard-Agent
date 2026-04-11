@@ -131,6 +131,7 @@ function parseContentParts(content: string): ContentPart[] {
 
 interface ChatMessageProps {
   message: ChatMessage;
+  readOnly?: boolean;
 }
 
 function ThinkingIndicator({ state }: { state: "thinking" | "querying" }) {
@@ -252,7 +253,7 @@ function FeedbackModal({ onSubmit, onClose }: { onSubmit: (text: string) => void
   );
 }
 
-export function ChatMessageBubble({ message }: ChatMessageProps) {
+export function ChatMessageBubble({ message, readOnly = false }: ChatMessageProps) {
   const isUser = message.role === "user";
   const [reaction, setReaction] = useState<"liked" | "disliked" | null>(message.reaction ?? null);
   const [copied, setCopied] = useState(false);
@@ -322,7 +323,7 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
               )}
             </div>
 
-            {/* Action buttons — only after streaming is done */}
+            {/* Action buttons — only after streaming is done and not read-only */}
             {!message.isStreaming && message.content.length > 0 && (
               <div className="flex items-center gap-1 mt-1.5 ml-1">
                 <button
@@ -332,7 +333,7 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
                 >
                   {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
                 </button>
-                <button
+                {!readOnly && <button
                   onClick={() => saveReaction("liked")}
                   title="Helpful"
                   className={`px-2 py-1 rounded-lg transition-colors ${
@@ -342,8 +343,8 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
                   }`}
                 >
                   <ThumbsUp className="h-3.5 w-3.5" />
-                </button>
-                <button
+                </button>}
+                {!readOnly && <button
                   onClick={handleDislike}
                   title="Not helpful"
                   className={`px-2 py-1 rounded-lg transition-colors ${
@@ -353,7 +354,7 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
                   }`}
                 >
                   <ThumbsDown className="h-3.5 w-3.5" />
-                </button>
+                </button>}
               </div>
             )}
           </div>

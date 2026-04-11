@@ -88,7 +88,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
             <ArrowLeft className="h-4 w-4" />
           </button>
           <div className="flex-1">
-            <ChatHeader dashboard={dashboard} sessionNumber={session.session_number} sessionTitle={session.title} />
+            <ChatHeader dashboard={dashboard} session={session} sessionNumber={session.session_number} sessionTitle={session.title} />
           </div>
         </div>
 
