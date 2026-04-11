@@ -173,9 +173,9 @@ export function useChat(initialMessages: ChatMessage[] = []) {
           );
         }
 
-        // Save assistant message to the database
+        // Save assistant message to the database and update ID to real DB ID
         if (payload.session_id && payload.user?.id) {
-          await fetch("/api/chat/save", {
+          const saveRes = await fetch("/api/chat/save", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -186,6 +186,12 @@ export function useChat(initialMessages: ChatMessage[] = []) {
               metadata,
             }),
           });
+          const saveData = await saveRes.json().catch(() => ({}));
+          if (saveData.messageId) {
+            setMessages((prev) =>
+              prev.map((m) => m.id === assistantId ? { ...m, id: saveData.messageId } : m)
+            );
+          }
         }
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Unknown error";

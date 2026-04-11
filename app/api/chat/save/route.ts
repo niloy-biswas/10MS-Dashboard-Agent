@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const success = await saveChatMessageToSession(
+    const messageId = await saveChatMessageToSession(
       sessionId,
       dashboardId,
       profileId,
@@ -18,11 +18,11 @@ export async function POST(req: NextRequest) {
       metadata
     );
 
-    if (!success) {
+    if (!messageId) {
       return NextResponse.json({ error: "Failed to save message" }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, messageId });
   } catch (err) {
     console.error("Chat save API error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
