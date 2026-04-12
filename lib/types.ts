@@ -21,6 +21,16 @@ export interface Profile {
   avatar_url: string | null;
 }
 
+export interface ToolCall {
+  tool: string;
+  input: Record<string, unknown>;
+  output?: string;
+}
+
+export type MessagePart =
+  | { type: "text"; content: string }
+  | { type: "tool_call"; toolCall: ToolCall };
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -32,6 +42,8 @@ export interface ChatMessage {
   thinkingState?: "thinking" | "querying" | null;
   reaction?: "liked" | "disliked" | null;
   feedback?: string | null;
+  toolCalls?: ToolCall[];
+  parts?: MessagePart[];
 }
 
 export interface ChatSession {
@@ -46,11 +58,18 @@ export interface ChatSession {
   updated_at: string;
 }
 
+export interface HistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export interface ChatPayload {
   session_id: string | null;
   dashboard_id: string;
   dashboard_number: string;
   dashboard_name: string;
+  model?: string;
+  history?: HistoryMessage[];
   user: {
     id: string;
     name: string;
