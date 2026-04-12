@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage } from "@/lib/types";
 import { ChartBlock, type ChartSpec } from "@/components/chat/chart-block";
+import { ToolCallBlock } from "@/components/chat/tool-call-block";
 import { THINKING_MESSAGES, QUERYING_MESSAGES } from "@/lib/thinking-messages";
 
 // Extract plain text from React children recursively
@@ -144,7 +145,7 @@ function ThinkingIndicator({ state }: { state: "thinking" | "querying" }) {
     const next = pool[Math.floor(Math.random() * pool.length)];
     setFullText(next);
     setDisplayed("");
-  }, [state]);
+  }, [state, pool]);
 
   // Rotate message every 3s
   useEffect(() => {
@@ -154,7 +155,7 @@ function ThinkingIndicator({ state }: { state: "thinking" | "querying" }) {
       setDisplayed("");
     }, 3000);
     return () => clearInterval(interval);
-  }, [state]);
+  }, [state, pool]);
 
   // Typewriter: reveal one character at a time
   useEffect(() => {
@@ -300,8 +301,35 @@ export function ChatMessageBubble({ message, readOnly = false }: ChatMessageProp
                 bg-white/55 backdrop-blur-md dark:bg-white/[0.05] border border-white/70 dark:border-white/[0.08]
                 ${message.isStreaming && message.content.length > 0 ? "streaming-cursor" : ""}`}
             >
-              {message.content.length === 0 && message.isStreaming ? (
+              {message.content.length === 0 && message.isStreaming && !message.parts?.length ? (
                 <ThinkingIndicator state={message.thinkingState === "querying" ? "querying" : "thinking"} />
+              ) : message.parts?.length ? (
+                // Interleaved parts: text segments and tool calls in order
+                <div>
+                  {message.parts.map((part, i) =>
+                    part.type === "tool_call" ? (
+                      <ToolCallBlock key={i} toolCall={part.toolCall} />
+                    ) : part.content.length === 0 && message.isStreaming ? (
+                      <ThinkingIndicator key={i} state={message.thinkingState === "querying" ? "querying" : "thinking"} />
+                    ) : (
+                      <div key={i} className="overflow-x-auto">
+                        {parseContentParts(part.content).map((cp, j) =>
+                          cp.type === "chart" ? (
+                            <ChartBlock key={j} spec={cp.spec} />
+                          ) : (
+                            <ReactMarkdown key={j} remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>
+                              {cp.content}
+                            </ReactMarkdown>
+                          )
+                        )}
+                      </div>
+                    )
+                  )}
+                  {/* Thinking indicator after last tool_call while waiting for next text */}
+                  {message.isStreaming && message.parts[message.parts.length - 1]?.type === "tool_call" && (
+                    <ThinkingIndicator state={message.thinkingState === "querying" ? "querying" : "thinking"} />
+                  )}
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   {parseContentParts(message.content).map((part, i) =>
