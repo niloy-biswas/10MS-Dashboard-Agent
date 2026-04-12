@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveChatMessageToSession } from "@/lib/supabase/queries";
+import type { MessagePart } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
   try {
-    const { sessionId, dashboardId, profileId, content, metadata } = await req.json();
+    const { sessionId, dashboardId, profileId, content, metadata, parts } = await req.json();
 
     if (!sessionId || !dashboardId || !profileId || !content) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -15,7 +16,8 @@ export async function POST(req: NextRequest) {
       profileId,
       "assistant",
       content,
-      metadata
+      metadata,
+      parts as MessagePart[] | undefined
     );
 
     if (!messageId) {

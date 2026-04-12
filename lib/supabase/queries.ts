@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Dashboard, Profile, ChatMessage, ChatSession } from "@/lib/types";
+import type { Dashboard, Profile, ChatMessage, ChatSession, MessagePart } from "@/lib/types";
 
 // Anon client for DB queries — all tables use permissive RLS (USING true)
 const supabase = createClient(
@@ -234,6 +234,7 @@ export async function getChatHistoryBySession(sessionId: string): Promise<ChatMe
     createdAt: row.created_at,
     reaction: row.reaction ?? null,
     feedback: row.feedback ?? null,
+    parts: (row.tool_calls as MessagePart[] | null) ?? undefined,
   }));
 }
 
@@ -243,8 +244,11 @@ export async function saveChatMessageToSession(
   profileId: string,
   role: "user" | "assistant",
   content: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>,
+  parts?: MessagePart[]
 ): Promise<string | null> {
+  // Only persist parts when they contain at least one tool call (otherwise content alone is sufficient)
+  const hasToolCalls = parts?.some((p) => p.type === "tool_call");
   const { data, error } = await supabase.from("chat_messages").insert({
     session_id: sessionId,
     dashboard_id: dashboardId,
@@ -252,6 +256,7 @@ export async function saveChatMessageToSession(
     role,
     content,
     metadata,
+    tool_calls: hasToolCalls ? parts : null,
   }).select("id").single();
   if (error) return null;
   return data.id;
