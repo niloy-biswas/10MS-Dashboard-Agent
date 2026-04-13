@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, AlertCircle } from "lucide-react";
+import { ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { ChatHeader, EmptyState } from "@/components/chat/chat-header";
@@ -26,6 +26,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
   const bottomRef = useRef<HTMLDivElement>(null);
   const prevMessageCountRef = useRef(messages.length);
   const [localSessions, setLocalSessions] = useState<ChatSession[]>(sessions);
+  const [navigatingBack, setNavigatingBack] = useState(false);
 
   useEffect(() => {
     const isNewMessage = messages.length !== prevMessageCountRef.current;
@@ -82,10 +83,13 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
         {/* Header */}
         <div className="relative z-10 flex items-center border-b border-border bg-card/80 backdrop-blur-md">
           <button
-            onClick={() => router.push("/")}
-            className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border-r border-border"
+            onClick={() => { setNavigatingBack(true); router.push("/"); }}
+            disabled={navigatingBack}
+            className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border-r border-border disabled:opacity-60"
           >
-            <ArrowLeft className="h-4 w-4" />
+            {navigatingBack
+              ? <Loader2 className="h-4 w-4 animate-spin" />
+              : <ArrowLeft className="h-4 w-4" />}
           </button>
           <div className="flex-1">
             <ChatHeader dashboard={dashboard} session={session} sessionNumber={session.session_number} sessionTitle={session.title} />

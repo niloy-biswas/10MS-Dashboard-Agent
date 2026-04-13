@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, BarChart2, Filter, Info, ExternalLink, Clock, Plus, MessageSquare } from "lucide-react";
+import { ChevronDown, BarChart2, Filter, Info, ExternalLink, Clock, Plus, MessageSquare, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
@@ -77,6 +77,7 @@ interface SessionsPanelProps {
 function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboardShortId, profileId }: SessionsPanelProps) {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
+  const [loadingSession, setLoadingSession] = useState<number | null>(null);
 
   const handleNewChat = async () => {
     setCreating(true);
@@ -93,6 +94,12 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
     } finally {
       setCreating(false);
     }
+  };
+
+  const handleSessionClick = (sessionNumber: number) => {
+    if (sessionNumber === currentSessionNumber) return;
+    setLoadingSession(sessionNumber);
+    router.push(`/chat/${dashboardShortId}/${sessionNumber}`);
   };
 
   return (
@@ -124,17 +131,23 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
         ) : (
           sessions.map((s) => {
             const isActive = s.session_number === currentSessionNumber;
+            const isLoading = loadingSession === s.session_number;
             return (
               <button
                 key={s.id}
-                onClick={() => router.push(`/chat/${dashboardShortId}/${s.session_number}`)}
+                onClick={() => handleSessionClick(s.session_number)}
+                disabled={isLoading}
                 className={`w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg transition-colors group ${
                   isActive
                     ? "bg-primary/12 border border-primary/20 text-foreground"
                     : "text-foreground/80 hover:bg-accent/50 hover:text-foreground border border-transparent"
-                }`}
+                } ${isLoading ? "opacity-70" : ""}`}
               >
-                <MessageSquare className={`h-3 w-3 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground/50 group-hover:text-muted-foreground"}`} />
+                {isLoading ? (
+                  <Loader2 className="h-3 w-3 shrink-0 text-primary animate-spin" />
+                ) : (
+                  <MessageSquare className={`h-3 w-3 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground/50 group-hover:text-muted-foreground"}`} />
+                )}
                 <span className="flex-1 min-w-0">
                   <span className="truncate text-xs block leading-tight">
                     {s.title === "New Chat" ? (
@@ -145,8 +158,11 @@ function SessionsPanel({ sessions, currentSessionNumber, dashboardUuid, dashboar
                     #{s.session_number}
                   </span>
                 </span>
-                {isActive && (
+                {isActive && !isLoading && (
                   <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-primary" />
+                )}
+                {isLoading && (
+                  <span className="shrink-0 text-[10px] text-primary/60">Loading…</span>
                 )}
               </button>
             );

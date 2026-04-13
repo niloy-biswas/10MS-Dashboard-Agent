@@ -100,6 +100,7 @@ export function ChatHeader({ dashboard, session, sessionNumber, sessionTitle }: 
       </div>
 
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         {session && (
           <div className="relative">
             <button
@@ -116,10 +117,9 @@ export function ChatHeader({ dashboard, session, sessionNumber, sessionTitle }: 
             {showShare && <SharePanel session={session} onClose={() => setShowShare(false)} />}
           </div>
         )}
-        <ThemeToggle />
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground border border-border rounded-full px-3 py-1.5">
           <Sparkles className="h-3 w-3 text-primary" />
-          AI Assistant
+          AI Intelligence
         </div>
       </div>
     </div>
