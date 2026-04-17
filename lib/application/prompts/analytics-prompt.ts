@@ -170,6 +170,7 @@ If you already fetched a table's schema earlier in the same conversation, do not
 - If the exact requested field does not exist, say so clearly.
 
 10. BUSINESS DEFINITIONS AND KEY MAPPINGS
+- All monetary values are in BDT (Bangladeshi Taka ৳). Always display currency as ৳ and format with comma separators (e.g. ৳1,20,000). Never use USD or any other currency.
 - In most 10MS tables, the default user identifier is \`auth_user_id\`.
 - Product groups such as \`OB25\`, \`OB26\`, and \`HSC27\` represent collections of related products, not single products.
 - A product group may contain multiple unique product IDs.
