@@ -1,6 +1,7 @@
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { createAnalyticsAgent } from "../agents/analytics-agent";
 import { createOpikHandler } from "../config/opik";
+import type { ResolvedChatRuntime } from "../runtime/resolve-chat-runtime";
 import type { ChatPayload } from "@/lib/types";
 
 type WireChunk =
@@ -10,8 +11,11 @@ type WireChunk =
   | { type: "tool_end"; tool: string; output: string }
   | { type: "error" };
 
-export async function streamAgentResponse(payload: ChatPayload): Promise<ReadableStream> {
-  const agent = await createAnalyticsAgent(payload);
+export async function streamAgentResponse(
+  payload: ChatPayload,
+  runtime: ResolvedChatRuntime
+): Promise<ReadableStream> {
+  const agent = await createAnalyticsAgent(payload, runtime);
   const opik = createOpikHandler();
 
   return new ReadableStream({

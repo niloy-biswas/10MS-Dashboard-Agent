@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { saveChatMessageToSession, updateSessionTitle, getDashboardTables, getChatHistoryBySession } from "@/lib/supabase/queries";
+import {
+  saveChatMessageToSession,
+  updateSessionTitle,
+  getDashboardTables,
+  getChatHistoryBySession,
+  getPublishedDashboardById,
+} from "@/lib/supabase/queries";
 import { runChatUseCase } from "@/lib/application/use_cases/chat";
+import { resolveChatRuntime } from "@/lib/application/runtime/resolve-chat-runtime";
 import type { ChatPayload, HistoryMessage, MessagePart } from "@/lib/types";
 
 // Extract SQL queries from stored parts (Option C: tool inputs only, no results)
@@ -74,7 +81,26 @@ export async function POST(req: NextRequest) {
       }));
     }
 
-    const stream = await runChatUseCase(payload);
+    const dashboard = await getPublishedDashboardById(payload.dashboard_id);
+    if (!dashboard) {
+      return NextResponse.json({ error: "Dashboard not found or not published" }, { status: 404 });
+    }
+    payload.description = dashboard.description;
+    payload.business_rules = dashboard.business_rules ?? null;
+    payload.caveats = dashboard.caveats ?? null;
+    payload.custom_instructions = dashboard.custom_instructions ?? null;
+    payload.example_questions = dashboard.example_questions ?? null;
+
+    let runtime;
+    try {
+      runtime = await resolveChatRuntime(dashboard);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to resolve LLM / data connection";
+      console.error("resolveChatRuntime:", err);
+      return NextResponse.json({ error: msg }, { status: 500 });
+    }
+
+    const stream = await runChatUseCase(payload, runtime);
 
     return new NextResponse(stream, {
       status: 200,

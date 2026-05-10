@@ -2,17 +2,21 @@ import { createAnthropicLLM } from "./anthropic";
 import { createOpenAILLM } from "./openai";
 import { ModelProvider } from "../enums/model-names";
 
-export function createLLM(model?: string) {
-  const provider = process.env.MODEL_PROVIDER as ModelProvider;
+export interface LlmRuntimeConfig {
+  provider: ModelProvider;
+  apiKey: string;
+  defaultModel: string;
+}
 
-  switch (provider) {
+export function createLLM(model: string | undefined, runtime: LlmRuntimeConfig) {
+  switch (runtime.provider) {
     case ModelProvider.Anthropic:
-      return createAnthropicLLM(model);
+      return createAnthropicLLM(model ?? runtime.defaultModel, runtime.apiKey);
     case ModelProvider.OpenAI:
-      return createOpenAILLM(model);
+      return createOpenAILLM(model ?? runtime.defaultModel, runtime.apiKey);
     default:
       throw new Error(
-        `Unknown MODEL_PROVIDER: "${provider}". Must be "anthropic" or "openai".`
+        `Unknown MODEL_PROVIDER: "${runtime.provider}". Must be "anthropic" or "openai".`
       );
   }
 }
