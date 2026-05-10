@@ -36,3 +36,9 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# mcp
+.mcp.json
+
+# supabase cli local metadata
+supabase/.temp/
