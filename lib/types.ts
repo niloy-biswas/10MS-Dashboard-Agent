@@ -9,7 +9,17 @@ export interface Dashboard {
   description: string | null;
   available_metrics: string[] | null;
   available_filters: string[] | null;
-  is_active: boolean;
+  /** Legacy column removed after admin migration — omit when absent */
+  is_active?: boolean;
+  /** After migration `001_admin_workspace`; absent on legacy rows until migrated */
+  status?: "draft" | "published" | "archived";
+  business_rules?: string | null;
+  caveats?: string | null;
+  custom_instructions?: string | null;
+  example_questions?: string[] | null;
+  published_at?: string | null;
+  published_by?: string | null;
+  data_source_id?: string | null;
   created_at: string;
 }
 
@@ -18,6 +28,7 @@ export interface Profile {
   name: string;
   email: string;
   role: string;
+  user_role?: "user" | "editor" | "admin";
   avatar_url: string | null;
 }
 
@@ -77,6 +88,11 @@ export interface ChatPayload {
     role: string;
   } | null;
   message: string;
+  description?: string | null;
+  business_rules?: string | null;
+  caveats?: string | null;
+  custom_instructions?: string | null;
+  example_questions?: string[] | null;
   context_tables?: {
     table_name: string;
     description: string;
