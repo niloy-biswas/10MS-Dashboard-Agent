@@ -1,5 +1,5 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { OpenAIModel } from "../enums/model-names";
+import { OPENAI_MODEL_CHOICES } from "../enums/model-names";
 
 export function createOpenAILLM(model?: string, apiKeyOverride?: string): ChatOpenAI {
   const apiKey = apiKeyOverride ?? process.env.OPENAI_API_KEY;
@@ -7,7 +7,7 @@ export function createOpenAILLM(model?: string, apiKeyOverride?: string): ChatOp
     throw new Error("OPENAI_API_KEY is not set");
   }
   return new ChatOpenAI({
-    model: model ?? process.env.OPENAI_DEFAULT_MODEL ?? OpenAIModel.GPT4o,
+    model: model ?? process.env.OPENAI_DEFAULT_MODEL ?? OPENAI_MODEL_CHOICES[0]!.value,
     apiKey,
     streaming: true,
   });

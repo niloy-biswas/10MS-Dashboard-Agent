@@ -1,6 +1,33 @@
 import { BigQuery } from "@google-cloud/bigquery";
 import { ModelProvider } from "@/lib/application/enums/model-names";
 
+/** App-supported OpenAI models are GPT-5.x (reasoning); chat completions use `max_completion_tokens`, not `max_tokens`. */
+async function openAiChatPing(model: string, apiKey: string): Promise<void> {
+  const url = "https://api.openai.com/v1/chat/completions";
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      max_completion_tokens: 16,
+      messages: [{ role: "user" as const, content: "ping" }],
+    }),
+  });
+  const text = await res.text();
+  if (res.ok) return;
+  let msg = text.slice(0, 400);
+  try {
+    const j = JSON.parse(text) as { error?: { message?: string } };
+    if (typeof j.error?.message === "string") msg = j.error.message;
+  } catch {
+    /* keep msg */
+  }
+  throw new Error(msg);
+}
+
 export async function testBigQueryConnection(opts: {
   projectId: string;
   credentialsJson?: string;
@@ -49,20 +76,5 @@ export async function testLlmConnection(
     return;
   }
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: 8,
-      messages: [{ role: "user", content: "ping" }],
-    }),
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(t.slice(0, 400));
-  }
+  await openAiChatPing(model, apiKey);
 }

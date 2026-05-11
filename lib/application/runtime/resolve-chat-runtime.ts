@@ -1,7 +1,8 @@
 import type { Dashboard } from "@/lib/types";
 import { decryptSecret } from "@/lib/secrets/credentials-crypto";
 import { adminGetDataSourceFullOptional, adminGetSetting } from "@/lib/supabase/admin-queries";
-import { AnthropicModel, ModelProvider, OpenAIModel } from "../enums/model-names";
+import { AnthropicModel, ModelProvider, OPENAI_MODEL_CHOICES } from "../enums/model-names";
+import { resolveLlmApiKeyFromSettings } from "./llm-api-key-from-settings";
 
 export interface ResolvedChatRuntime {
   llm: {
@@ -25,18 +26,10 @@ function parseProvider(v: string | null | undefined): ModelProvider {
 export async function resolveChatRuntime(dashboard: Dashboard): Promise<ResolvedChatRuntime> {
   const ai_provider = await adminGetSetting("ai_provider");
   const ai_model = await adminGetSetting("ai_model");
-  const ai_key_enc = await adminGetSetting("ai_api_key_encrypted");
 
   const provider = parseProvider(ai_provider);
 
-  let apiKey: string | undefined;
-  if (ai_key_enc) {
-    try {
-      apiKey = decryptSecret(ai_key_enc);
-    } catch {
-      apiKey = undefined;
-    }
-  }
+  let apiKey = await resolveLlmApiKeyFromSettings(provider);
   if (!apiKey) {
     apiKey =
       provider === ModelProvider.Anthropic
@@ -48,7 +41,7 @@ export async function resolveChatRuntime(dashboard: Dashboard): Promise<Resolved
     ai_model ??
     (provider === ModelProvider.Anthropic
       ? process.env.ANTHROPIC_DEFAULT_MODEL ?? AnthropicModel.Sonnet4_5
-      : process.env.OPENAI_DEFAULT_MODEL ?? OpenAIModel.GPT4o);
+      : process.env.OPENAI_DEFAULT_MODEL ?? OPENAI_MODEL_CHOICES[0]!.value);
 
   if (!apiKey) {
     throw new Error(
