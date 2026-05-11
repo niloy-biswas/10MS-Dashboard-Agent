@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { emailMatchesAllowedDomain } from "@/lib/auth/allowed-email-domain";
+import { resolveAllowedEmailDomainHost } from "@/lib/auth/resolve-allowed-email-domain";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -59,11 +61,12 @@ export async function GET(request: NextRequest) {
   const user = data.user;
   const email = user?.email ?? "";
 
-  if (!email.endsWith("@10minuteschool.com")) {
+  const allowedDomainHost = await resolveAllowedEmailDomainHost();
+  if (!emailMatchesAllowedDomain(email, allowedDomainHost)) {
     await supabase.auth.signOut();
     return NextResponse.redirect(
       `${origin}/login?error=${encodeURIComponent(
-        "Only @10minuteschool.com Google accounts are allowed."
+        `Only Google accounts with an @${allowedDomainHost} email are allowed.`
       )}`
     );
   }

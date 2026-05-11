@@ -43,7 +43,7 @@ export default function AuthSettingsPage() {
   }
 
   return (
-    <div className="max-w-lg space-y-8">
+    <div className="w-full space-y-8">
       <div>
         <h1 className="text-xl font-semibold text-foreground tracking-tight">Auth</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -62,7 +62,7 @@ export default function AuthSettingsPage() {
         <CardHeader>
           <CardTitle className="text-base">Allowed email domain</CardTitle>
           <CardDescription>
-            Store plain domain without @ (e.g. <span className="font-mono">10minuteschool.com</span>
+            Store plain domain without @ (e.g. <span className="font-mono">company.com</span>
             ). Requires <span className="font-mono text-xs">enforce_email_domain</span> trigger on{" "}
             <span className="font-mono text-xs">auth.users</span> in Supabase.
           </CardDescription>
@@ -76,7 +76,7 @@ export default function AuthSettingsPage() {
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 className="w-full h-10 px-3 rounded-lg bg-input border border-border text-sm font-mono"
-                placeholder="* or 10minuteschool.com"
+                placeholder="* or company.com"
               />
               <Button type="submit">Save</Button>
             </form>

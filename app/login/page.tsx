@@ -8,6 +8,10 @@ import { Eye, EyeOff, LogIn, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleIcon } from "@/components/auth/google-icon";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import {
+  googleOAuthHostedDomain,
+  normalizeAllowedEmailDomainHost,
+} from "@/lib/auth/allowed-email-domain";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,11 +21,31 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [allowedEmailHost, setAllowedEmailHost] = useState("*");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlError = params.get("error");
-    if (urlError) setError(decodeURIComponent(urlError));
+    if (urlError) {
+      queueMicrotask(() => setError(decodeURIComponent(urlError)));
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/public/allowed-email-domain")
+      .then((r) => r.json())
+      .then((d: { allowed_email_domain?: string }) => {
+        if (!cancelled) {
+          setAllowedEmailHost(normalizeAllowedEmailDomainHost(d.allowed_email_domain ?? "*"));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setAllowedEmailHost("*");
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleGoogleSignIn = async () => {
@@ -30,11 +54,12 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search);
     const next = params.get("next") ?? "";
     const supabase = createClient();
+    const hd = googleOAuthHostedDomain(allowedEmailHost);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`,
-        queryParams: { hd: "10minuteschool.com" },
+        ...(hd ? { queryParams: { hd } } : {}),
       },
     });
     if (error) {
@@ -201,7 +226,9 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  placeholder="you@10minuteschool.com"
+                  placeholder={
+                    allowedEmailHost !== "*" ? `you@${allowedEmailHost}` : "you@company.com"
+                  }
                   className="w-full h-11 px-4 rounded-xl bg-input border border-border/60 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 transition-all duration-200"
                 />
               </div>
@@ -270,7 +297,9 @@ export default function LoginPage() {
 
         {/* Bottom badge */}
         <p className="text-center text-xs text-muted-foreground/40 mt-5 tracking-wider uppercase">
-          Restricted to @10minuteschool.com accounts
+          {allowedEmailHost !== "*"
+            ? `Restricted to @${allowedEmailHost} accounts`
+            : "Open login — any email"}
         </p>
 
       </motion.div>
