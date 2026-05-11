@@ -162,7 +162,7 @@ export default function DataSourcesSettingsPage() {
   }
 
   return (
-    <div className="max-w-3xl space-y-8">
+    <div className="w-full space-y-8">
       <div>
         <h1 className="text-xl font-semibold text-foreground tracking-tight">Data sources</h1>
         <p className="text-sm text-muted-foreground mt-1">

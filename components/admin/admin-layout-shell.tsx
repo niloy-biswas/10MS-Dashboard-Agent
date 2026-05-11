@@ -193,7 +193,9 @@ export function AdminLayoutShell({ profile, isAdmin, children }: AdminLayoutShel
           </div>
         </header>
 
-        <main className="relative z-10 flex-1 overflow-y-auto p-6 md:p-10">{children}</main>
+        <main className="relative z-10 flex-1 overflow-y-auto p-6 md:p-8 xl:p-10">
+          <div className="mx-auto w-full max-w-screen-2xl">{children}</div>
+        </main>
       </div>
     </div>
   );

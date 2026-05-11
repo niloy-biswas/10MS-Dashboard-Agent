@@ -83,7 +83,7 @@ export function UsersManagement() {
   }
 
   return (
-    <div className="max-w-5xl space-y-8">
+    <div className="w-full space-y-8">
       <div>
         <h1 className="text-xl font-semibold text-foreground tracking-tight">Users</h1>
         <p className="text-sm text-muted-foreground mt-1">

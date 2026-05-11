@@ -345,3 +345,84 @@ export async function adminTransitionDashboardStatus(
   const { error } = await admin.from("dashboards").update(patch).eq("id", id);
   if (error) throw error;
 }
+
+/** Aggregates for `/admin` overview — service role only; returns null if admin client unavailable. */
+export interface AdminTopDashboardByMessages {
+  id: string;
+  dashboard_code: string;
+  dashboard_name: string;
+  message_count: number;
+}
+
+export interface AdminWorkspaceOverviewStats {
+  published_dashboards: number;
+  total_dashboards: number;
+  data_sources: number;
+  users: number;
+  chat_sessions: number;
+  chat_messages: number;
+  ai_provider: string | null;
+  ai_model: string | null;
+  /** Empty if no messages, RPC missing, or RPC error. */
+  top_dashboards_by_messages: AdminTopDashboardByMessages[];
+}
+
+export async function adminGetWorkspaceOverviewStats(): Promise<AdminWorkspaceOverviewStats | null> {
+  const admin = tryCreateAdminClient();
+  if (!admin) return null;
+
+  const countRows = async (
+    table: string,
+    eq?: { column: string; value: string }
+  ): Promise<number> => {
+    let q = admin.from(table).select("id", { count: "exact", head: true });
+    if (eq) q = q.eq(eq.column, eq.value);
+    const { count, error } = await q;
+    if (error) return 0;
+    return count ?? 0;
+  };
+
+  const [
+    published_dashboards,
+    total_dashboards,
+    data_sources,
+    users,
+    chat_sessions,
+    chat_messages,
+    providerRes,
+    modelRes,
+    topRpc,
+  ] = await Promise.all([
+    countRows("dashboards", { column: "status", value: "published" }),
+    countRows("dashboards"),
+    countRows("data_sources"),
+    countRows("profiles"),
+    countRows("chat_sessions"),
+    countRows("chat_messages"),
+    admin.from("app_settings").select("value").eq("key", "ai_provider").maybeSingle(),
+    admin.from("app_settings").select("value").eq("key", "ai_model").maybeSingle(),
+    admin.rpc("admin_top_dashboards_by_messages", { p_limit: 3 }),
+  ]);
+
+  let top_dashboards_by_messages: AdminTopDashboardByMessages[] = [];
+  if (!topRpc.error && Array.isArray(topRpc.data)) {
+    top_dashboards_by_messages = topRpc.data.map((row: Record<string, unknown>) => ({
+      id: String(row.id),
+      dashboard_code: String(row.dashboard_code ?? ""),
+      dashboard_name: String(row.dashboard_name ?? ""),
+      message_count: Number(row.message_count ?? 0),
+    }));
+  }
+
+  return {
+    published_dashboards,
+    total_dashboards,
+    data_sources,
+    users,
+    chat_sessions,
+    chat_messages,
+    ai_provider: providerRes.data?.value ?? null,
+    ai_model: modelRes.data?.value ?? null,
+    top_dashboards_by_messages,
+  };
+}
