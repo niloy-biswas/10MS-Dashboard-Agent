@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { Download } from "lucide-react";
 import {
@@ -149,7 +149,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
 
   // Compute once: should all x-axis labels rotate together?
   const shouldRotate = spec.x_key ? wouldOverlap(spec.data, spec.x_key) : false;
-  const AngledTick = makeAngledTick(shouldRotate, c.tick);
+  const AngledTick = useMemo(() => makeAngledTick(shouldRotate, c.tick), [shouldRotate, c.tick]);
 
   // Validate required fields based on chart type
   const isInvalid =
