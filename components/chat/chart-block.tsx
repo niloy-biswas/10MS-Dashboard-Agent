@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, memo } from "react";
 import { useTheme } from "next-themes";
 import { Download } from "lucide-react";
 import {
@@ -117,7 +117,7 @@ function xAxisMargin(shouldRotate: boolean): { top: number; bottom: number } {
   };
 }
 
-export function ChartBlock({ spec }: { spec: ChartSpec }) {
+function ChartBlockInner({ spec }: { spec: ChartSpec }) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
   const c = {
@@ -473,3 +473,7 @@ export function ChartBlock({ spec }: { spec: ChartSpec }) {
     </div>
   );
 }
+
+export const ChartBlock = memo(ChartBlockInner, (prev, next) =>
+  JSON.stringify(prev.spec) === JSON.stringify(next.spec)
+);
