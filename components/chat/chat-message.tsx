@@ -6,6 +6,7 @@ import { AlertCircle, FileDown, ThumbsUp, ThumbsDown, Copy, Check, X } from "luc
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage } from "@/lib/types";
+import { HighlightedCode } from "@/components/chat/highlighted-code";
 import { ChartBlock, type ChartSpec } from "@/components/chat/chart-block";
 import { ToolCallBlock } from "@/components/chat/tool-call-block";
 import { THINKING_MESSAGES, QUERYING_MESSAGES } from "@/lib/thinking-messages";
@@ -194,6 +195,22 @@ function ThinkingIndicator({ state }: { state: "thinking" | "querying" }) {
   );
 }
 
+function CodeBlock({ className, children }: { className?: string; children?: React.ReactNode }) {
+  const match = /language-(\w+)/.exec(className ?? "");
+  const language = match?.[1] ?? "";
+  const code = String(children).replace(/\n$/, "");
+
+  if (language) {
+    return <HighlightedCode code={code} language={language} wrapperClassName="my-2" />;
+  }
+
+  return (
+    <code className="bg-muted border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground/80">
+      {children}
+    </code>
+  );
+}
+
 const MARKDOWN_COMPONENTS = {
   table: ({ children }: { children?: React.ReactNode }) => <DownloadableTable>{children}</DownloadableTable>,
   thead: ({ children }: { children?: React.ReactNode }) => <thead className="bg-primary/10 dark:bg-white/[0.06]">{children}</thead>,
@@ -204,8 +221,8 @@ const MARKDOWN_COMPONENTS = {
   ol: ({ children }: { children?: React.ReactNode }) => <ol className="list-decimal pl-4 my-1.5 space-y-0.5">{children}</ol>,
   li: ({ children }: { children?: React.ReactNode }) => <li className="my-0">{children}</li>,
   strong: ({ children }: { children?: React.ReactNode }) => <strong className="font-semibold text-foreground">{children}</strong>,
-  code: ({ children }: { children?: React.ReactNode }) => <code className="bg-muted border border-border rounded px-1.5 py-0.5 text-xs font-mono text-foreground/80">{children}</code>,
-  pre: ({ children }: { children?: React.ReactNode }) => <pre className="bg-muted border border-border rounded-xl p-3 overflow-x-auto text-xs my-2">{children}</pre>,
+  code: CodeBlock,
+  pre: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
   h1: ({ children }: { children?: React.ReactNode }) => <h1 className="text-base font-bold mt-3 mb-1.5 text-foreground">{children}</h1>,
   h2: ({ children }: { children?: React.ReactNode }) => <h2 className="text-sm font-bold mt-3 mb-1.5 text-foreground">{children}</h2>,
   h3: ({ children }: { children?: React.ReactNode }) => <h3 className="text-sm font-semibold mt-2 mb-1 text-foreground/90">{children}</h3>,
