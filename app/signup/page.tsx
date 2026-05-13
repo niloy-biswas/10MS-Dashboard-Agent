@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -15,6 +15,11 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { GoogleIcon } from "@/components/auth/google-icon";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import {
+  emailMatchesAllowedDomain,
+  googleOAuthHostedDomain,
+  normalizeAllowedEmailDomainHost,
+} from "@/lib/auth/allowed-email-domain";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -25,16 +30,35 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [allowedEmailHost, setAllowedEmailHost] = useState("*");
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/public/allowed-email-domain")
+      .then((r) => r.json())
+      .then((d: { allowed_email_domain?: string }) => {
+        if (!cancelled) {
+          setAllowedEmailHost(normalizeAllowedEmailDomainHost(d.allowed_email_domain ?? "*"));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setAllowedEmailHost("*");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleGoogleSignUp = async () => {
     setError(null);
     setGoogleLoading(true);
     const supabase = createClient();
+    const hd = googleOAuthHostedDomain(allowedEmailHost);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: { hd: "10minuteschool.com" },
+        ...(hd ? { queryParams: { hd } } : {}),
       },
     });
     if (error) {
@@ -46,16 +70,17 @@ export default function SignupPage() {
     }
   };
 
+  const restrictedDomain = allowedEmailHost !== "*";
   const hasTypedAt = email.includes("@");
-  const isValidDomain = email.endsWith("@10minuteschool.com");
-  const showDomainFeedback = hasTypedAt;
+  const isValidDomain = emailMatchesAllowedDomain(email, allowedEmailHost);
+  const showDomainFeedback = restrictedDomain && hasTypedAt;
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!isValidDomain) {
-      setError("Only @10minuteschool.com email addresses are allowed.");
+    if (restrictedDomain && !emailMatchesAllowedDomain(email, allowedEmailHost)) {
+      setError(`Only @${allowedEmailHost} email addresses are allowed.`);
       return;
     }
 
@@ -257,7 +282,9 @@ export default function SignupPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     autoComplete="email"
-                    placeholder="you@10minuteschool.com"
+                    placeholder={
+                      restrictedDomain ? `you@${allowedEmailHost}` : "you@company.com"
+                    }
                     className={`w-full h-11 px-4 pr-10 rounded-xl bg-input border text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 transition-all duration-200 ${
                       showDomainFeedback
                         ? isValidDomain
@@ -278,7 +305,7 @@ export default function SignupPage() {
                 </div>
                 {showDomainFeedback && !isValidDomain && (
                   <p className="text-xs text-destructive/80 mt-1">
-                    Must be a @10minuteschool.com address
+                    Must be an @{allowedEmailHost} address
                   </p>
                 )}
               </div>
@@ -314,7 +341,7 @@ export default function SignupPage() {
 
               <button
                 type="submit"
-                disabled={loading || (showDomainFeedback && !isValidDomain)}
+                disabled={loading || (restrictedDomain && showDomainFeedback && !isValidDomain)}
                 className="w-full h-11 mt-1 bg-primary hover:bg-primary/90 active:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_24px_rgba(229,57,53,0.35)] hover:shadow-[0_4px_32px_rgba(229,57,53,0.5)] transition-all duration-200"
               >
                 {loading ? (
@@ -347,7 +374,7 @@ export default function SignupPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground/40 mt-5 tracking-wider uppercase">
-          Restricted to @10minuteschool.com accounts
+          {restrictedDomain ? `Restricted to @${allowedEmailHost} accounts` : "Open signup — any email"}
         </p>
 
       </motion.div>

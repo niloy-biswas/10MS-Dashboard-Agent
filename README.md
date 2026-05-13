@@ -39,15 +39,17 @@ cp .env.example .env.local
 
 Key variables to set:
 
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
-| `MODEL_PROVIDER` | `anthropic` or `openai` |
-| `ANTHROPIC_API_KEY` | Required if `MODEL_PROVIDER=anthropic` |
-| `OPENAI_API_KEY` | Required if `MODEL_PROVIDER=openai` |
-| `BIGQUERY_PROJECT` | GCP project ID |
+
+| Variable                              | Description                            |
+| ------------------------------------- | -------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`            | Supabase project URL                   |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`       | Supabase anon key                      |
+| `MODEL_PROVIDER`                      | `anthropic` or `openai`                |
+| `ANTHROPIC_API_KEY`                   | Required if `MODEL_PROVIDER=anthropic` |
+| `OPENAI_API_KEY`                      | Required if `MODEL_PROVIDER=openai`    |
+| `BIGQUERY_PROJECT`                    | GCP project ID                         |
 | `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Service account key JSON (single line) |
+
 
 **3. Set up Supabase**
 
@@ -65,11 +67,13 @@ ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS tool_calls JSONB;
 ```
 
 In the Supabase dashboard under Authentication > Settings:
+
 - Disable "Enable email confirmations" (internal tool)
 
 **4. BigQuery credentials (local development)**
 
 Option A — Service account key (same as production):
+
 ```bash
 # Minify the JSON to a single line and add to .env.local
 cat your-service-account.json | tr -d '\n'
@@ -77,6 +81,7 @@ cat your-service-account.json | tr -d '\n'
 ```
 
 Option B — Application Default Credentials:
+
 ```bash
 gcloud auth application-default login
 # Leave GOOGLE_APPLICATION_CREDENTIALS_JSON unset in .env.local
@@ -126,3 +131,4 @@ components/
 hooks/
   use-chat.ts        Streaming state management
 ```
+

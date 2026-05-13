@@ -293,12 +293,27 @@ function getDhakaDatetime(): string {
 // ─── Dynamic section 3 ───────────────────────────────────────────────────────
 
 function buildContextSection(payload: ChatPayload): string {
+  const contextRows = [
+    payload.description ? `- Description: ${payload.description}` : null,
+    payload.business_rules ? `- Business Rules:\n${payload.business_rules}` : null,
+    payload.caveats ? `- Caveats / Known Data Issues:\n${payload.caveats}` : null,
+    payload.custom_instructions
+      ? `- Dashboard-Specific Instructions:\n${payload.custom_instructions}`
+      : null,
+    payload.example_questions && payload.example_questions.length > 0
+      ? `- Example Questions:\n${payload.example_questions.map((q) => `  - ${q}`).join("\n")}`
+      : null,
+  ].filter(Boolean);
+
   return `
 3. Current Conversation Context
 - User Name: ${payload.user?.name ?? "Unknown"}
 - User Email: ${payload.user?.email ?? "Unknown"}
 - Current Datetime: ${getDhakaDatetime()}
 - Dashboard: ${payload.dashboard_name} (${payload.dashboard_number})
+${contextRows.length > 0 ? `${contextRows.join("\n")}\n` : ""}- Dashboard Context Notes:
+- Treat business rules, caveats, and dashboard-specific instructions above as authoritative for this dashboard.
+- If they conflict with general assumptions, follow the dashboard-specific context.
 - Available BigQuery Tables:
 ${JSON.stringify(payload.context_tables ?? [], null, 2)}
 - You may use ONLY the tables explicitly listed above.

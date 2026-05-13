@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronRight, Database, List, Table2, Loader2 } from "lucide-react";
+import { HighlightedCode } from "@/components/chat/highlighted-code";
 import type { ToolCall } from "@/lib/types";
 
 const TOOL_META: Record<string, { label: string; icon: React.ReactNode }> = {
@@ -119,9 +120,12 @@ export function ToolCallBlock({ toolCall }: { toolCall: ToolCall }) {
           <div className="px-3 py-2.5">
             <p className="text-muted-foreground mb-1.5 uppercase tracking-wide text-[10px] font-semibold">Input</p>
             {sql ? (
-              <pre className="whitespace-pre font-mono text-foreground/80 leading-relaxed overflow-x-auto">
-                {sql}
-              </pre>
+              <HighlightedCode
+                code={sql}
+                language="sql"
+                wrapperClassName="-mx-3 -mb-2.5"
+                customStyle={{ borderRadius: "0 0 0.75rem 0.75rem", fontSize: "0.72rem", border: "none", padding: "0.75rem 1rem" }}
+              />
             ) : (
               <pre className="whitespace-pre-wrap break-all font-mono text-foreground/80 leading-relaxed">
                 {JSON.stringify(unwrappedInput, null, 2)}

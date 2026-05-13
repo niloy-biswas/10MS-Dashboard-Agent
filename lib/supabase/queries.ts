@@ -11,7 +11,7 @@ export async function getDashboards(): Promise<Dashboard[]> {
   const { data, error } = await supabase
     .from("dashboards")
     .select("*")
-    .eq("is_active", true)
+    .eq("status", "published")
     .order("dashboard_id", { ascending: true });
 
   if (error) {
@@ -35,6 +35,21 @@ export async function getDashboardById(id: string): Promise<Dashboard | null> {
   return data as Dashboard;
 }
 
+export async function getPublishedDashboardById(id: string): Promise<Dashboard | null> {
+  const { data, error } = await supabase
+    .from("dashboards")
+    .select("*")
+    .eq("id", id)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching published dashboard:", error.message);
+    return null;
+  }
+  return data as Dashboard | null;
+}
+
 export async function getDashboardByShortId(shortId: string): Promise<Dashboard | null> {
   const { data, error } = await supabase
     .from("dashboards")
@@ -50,6 +65,24 @@ export async function getDashboardByShortId(shortId: string): Promise<Dashboard 
 export async function getDashboardByAnyId(id: string): Promise<Dashboard | null> {
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   return isUuid ? getDashboardById(id) : getDashboardByShortId(id);
+}
+
+/** Chat and public selector: only published dashboards */
+export async function getPublishedDashboardByAnyId(id: string): Promise<Dashboard | null> {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  const col = isUuid ? "id" : "dashboard_id";
+  const { data, error } = await supabase
+    .from("dashboards")
+    .select("*")
+    .eq(col, id)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching published dashboard:", error.message);
+    return null;
+  }
+  return data as Dashboard | null;
 }
 
 export async function getUserProfile(userId: string): Promise<Profile | null> {

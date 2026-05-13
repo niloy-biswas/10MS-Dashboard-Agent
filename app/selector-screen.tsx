@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { BarChart2, Sparkles } from "lucide-react";
+import { BarChart2, Settings, Sparkles } from "lucide-react";
 import { DashboardSelector } from "@/components/dashboard/dashboard-selector";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
@@ -60,6 +61,15 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
                     <p className="text-xs text-muted-foreground">{profile.role}</p>
                   </div>
                   <UserAvatar name={profile.name} avatarUrl={profile.avatar_url} size="sm" />
+                  {(profile.user_role === "editor" || profile.user_role === "admin") && (
+                    <Link
+                      href="/admin"
+                      className="text-xs font-medium text-primary hover:underline inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-muted transition-colors"
+                    >
+                      <Settings className="h-3.5 w-3.5" />
+                      Admin
+                    </Link>
+                  )}
                   <LogoutButton />
                 </>
               )}
