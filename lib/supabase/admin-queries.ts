@@ -1,4 +1,4 @@
-import { encryptSecret } from "@/lib/secrets/credentials-crypto";
+import { decryptSecret, encryptSecret } from "@/lib/secrets/credentials-crypto";
 import { createAdminClient, tryCreateAdminClient } from "./admin-client";
 
 export interface DataSourcePublic {
@@ -61,6 +61,22 @@ export async function adminGetDataSourceFull(id: string): Promise<DataSourceRow 
   return data as DataSourceRow | null;
 }
 
+/** Prefer pasted JSON; otherwise decrypt stored credentials for the data source. */
+export async function adminResolveDataSourceCredentials(
+  id: string,
+  credentialsJson?: string | null
+): Promise<string> {
+  const trimmed = credentialsJson?.trim();
+  if (trimmed) return trimmed;
+  const existing = await adminGetDataSourceFull(id);
+  if (!existing?.credentials_encrypted) {
+    throw new Error(
+      "No stored credentials found. Paste service account JSON before continuing."
+    );
+  }
+  return decryptSecret(existing.credentials_encrypted);
+}
+
 export async function adminInsertBigQueryDataSource(params: {
   label: string;
   project_id: string;
@@ -112,6 +128,21 @@ export async function adminUpdateBigQueryDataSource(params: {
 
   const { error } = await admin.from("data_sources").update(patch).eq("id", params.id);
   if (error) throw error;
+}
+
+export async function adminMarkDataSourceTested(id: string): Promise<string> {
+  const admin = createAdminClient();
+  const last_tested_at = new Date().toISOString();
+  const { error } = await admin
+    .from("data_sources")
+    .update({
+      status: "connected",
+      last_tested_at,
+      updated_at: last_tested_at,
+    })
+    .eq("id", id);
+  if (error) throw error;
+  return last_tested_at;
 }
 
 export async function adminDeleteDataSource(id: string): Promise<void> {
