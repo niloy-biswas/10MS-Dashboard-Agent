@@ -5,7 +5,7 @@ import { getSessionProfile } from "@/lib/auth/require-role";
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSessionProfile();
   if (!session || (session.userRole !== "editor" && session.userRole !== "admin")) {
-    redirect("/");
+    redirect("/app");
   }
 
   const isAdmin = session.userRole === "admin";

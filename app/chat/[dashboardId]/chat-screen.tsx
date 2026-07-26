@@ -94,7 +94,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
         {/* Header */}
         <div className="relative z-10 flex items-center border-b border-border bg-card/80 backdrop-blur-md">
           <button
-            onClick={() => { setNavigatingBack(true); router.push("/"); }}
+            onClick={() => { setNavigatingBack(true); router.push("/app"); }}
             disabled={navigatingBack}
             className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border-r border-border disabled:opacity-60"
           >

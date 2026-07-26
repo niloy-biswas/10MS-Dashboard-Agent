@@ -18,6 +18,7 @@ import {
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { BRAND } from "@/lib/brand";
 import type { Profile } from "@/lib/types";
 
 interface AdminLayoutShellProps {
@@ -92,8 +93,8 @@ export function AdminLayoutShell({ profile, isAdmin, children }: AdminLayoutShel
               <Image src="/10ms-logo.png" alt="10MS" width={28} height={28} className="object-cover w-full h-full" />
             </div>
             <div>
-              <p className="text-xs font-bold text-foreground tracking-wide">10MS ANALYTICS</p>
-              <p className="text-xs text-muted-foreground">Internal Intelligence</p>
+              <p className="text-xs font-bold text-foreground tracking-wide uppercase">{BRAND.name}</p>
+              <p className="text-xs text-muted-foreground">{BRAND.productLabel}</p>
             </div>
           </div>
         </div>
@@ -179,7 +180,7 @@ export function AdminLayoutShell({ profile, isAdmin, children }: AdminLayoutShel
             <div className="flex items-center gap-2 shrink-0">
               <ThemeToggle />
               <Link
-                href="/"
+                href="/app"
                 className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
               >
                 <ArrowLeft className="h-3 w-3" />

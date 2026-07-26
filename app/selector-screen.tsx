@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { BarChart2, Settings, Sparkles } from "lucide-react";
+import { Layers, Settings, Sparkles } from "lucide-react";
 import { DashboardSelector } from "@/components/dashboard/dashboard-selector";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { BRAND } from "@/lib/brand";
 import type { Dashboard, Profile } from "@/lib/types";
 
 interface SelectorScreenProps {
@@ -45,11 +46,11 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
           <div className="flex items-center justify-between mb-7">
             <div className="flex items-center gap-2.5">
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_14px_var(--primary-glow)]">
-                <BarChart2 className="h-4 w-4 text-white" />
+                <Layers className="h-4 w-4 text-white" />
               </div>
               <div>
-                <p className="text-base font-black font-mono tracking-tight bg-gradient-to-r from-[#d63031] via-[#a855b5] to-[#4c51bf] bg-clip-text text-transparent">10MS Analytics</p>
-                <p className="text-xs text-muted-foreground">Internal Intelligence</p>
+                <p className="text-base font-black tracking-tight text-foreground">{BRAND.name}</p>
+                <p className="text-xs text-muted-foreground">{BRAND.productLabel}</p>
               </div>
             </div>
 
@@ -92,8 +93,8 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
           {/* Selector list */}
           {dashboards.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground text-sm">
-              <BarChart2 className="h-10 w-10 mx-auto opacity-20 mb-3" />
-              No dashboards found. Check your Supabase connection.
+              <Layers className="h-10 w-10 mx-auto opacity-20 mb-3" />
+              No published dashboards yet. Ask an admin to publish one.
             </div>
           ) : (
             <DashboardSelector dashboards={dashboards} onSelect={handleSelect} />
@@ -105,7 +106,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
           <p className="text-xs text-muted-foreground/50">
             {dashboards.length} dashboard{dashboards.length !== 1 ? "s" : ""} available
           </p>
-          <p className="text-xs text-muted-foreground/40 font-mono">10MS · Internal Only</p>
+          <p className="text-xs text-muted-foreground/40 font-mono">{BRAND.name}</p>
         </div>
       </motion.div>
     </main>

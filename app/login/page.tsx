@@ -12,6 +12,7 @@ import {
   googleOAuthHostedDomain,
   normalizeAllowedEmailDomainHost,
 } from "@/lib/auth/allowed-email-domain";
+import { BRAND } from "@/lib/brand";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -85,7 +86,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/");
+    router.push("/app");
     router.refresh();
   };
 
@@ -141,11 +142,11 @@ export default function LoginPage() {
                 alt="TenTen"
                 className="h-20 w-20 object-contain mb-1"
               />
-              <p className="text-2xl font-black tracking-tight text-center font-mono bg-gradient-to-r from-[#d63031] via-[#a855b5] to-[#4c51bf] bg-clip-text text-transparent">
-                10MS Analytics
+              <p className="text-2xl font-black tracking-tight text-center text-foreground">
+                {BRAND.name}
               </p>
               <p className="text-xs text-muted-foreground tracking-widest text-center uppercase">
-                Internal Intelligence
+                {BRAND.productLabel}
               </p>
             </motion.div>
 

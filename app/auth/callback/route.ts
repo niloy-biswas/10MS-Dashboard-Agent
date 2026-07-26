@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
 
   // Redirect to ?next= if provided, otherwise home
   const next = searchParams.get("next");
-  const destination = next ? `${origin}${next}` : `${origin}/`;
+  const destination = next ? `${origin}${next}` : `${origin}/app`;
   const response = NextResponse.redirect(destination);
   cookiesToApply.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2]);

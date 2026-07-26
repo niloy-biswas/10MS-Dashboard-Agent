@@ -7,6 +7,7 @@ import { ChevronDown, BarChart2, Filter, Info, ExternalLink, Clock, Plus, Messag
 import Image from "next/image";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
+import { BRAND } from "@/lib/brand";
 import type { Dashboard, Profile, ChatSession } from "@/lib/types";
 
 // ── Collapsible section ──────────────────────────────────
@@ -192,8 +193,8 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
             <Image src="/10ms-logo.png" alt="10MS" width={28} height={28} className="object-cover w-full h-full" />
           </div>
           <div>
-            <p className="text-xs font-bold text-foreground tracking-wide">10MS ANALYTICS</p>
-            <p className="text-xs text-muted-foreground">Internal Intelligence</p>
+              <p className="text-xs font-bold text-foreground tracking-wide uppercase">{BRAND.name}</p>
+              <p className="text-xs text-muted-foreground">{BRAND.productLabel}</p>
           </div>
         </div>
       </div>

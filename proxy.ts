@@ -41,8 +41,10 @@ export async function proxy(request: NextRequest) {
 
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/signup");
   const isPublicApi = pathname.startsWith("/api/public");
+  // Marketing landing is public; product lives under /app
+  const isPublicMarketing = pathname === "/";
 
-  if (!user && !isAuthPage && !isPublicApi) {
+  if (!user && !isAuthPage && !isPublicApi && !isPublicMarketing) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -50,7 +52,7 @@ export async function proxy(request: NextRequest) {
 
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/app";
     return NextResponse.redirect(url);
   }
 
