@@ -21,6 +21,7 @@ import {
   normalizeAllowedEmailDomainHost,
 } from "@/lib/auth/allowed-email-domain";
 import { BRAND } from "@/lib/brand";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -172,11 +173,7 @@ export default function SignupPage() {
               transition={{ delay: 0.1, duration: 0.4 }}
               className="flex flex-col items-center gap-1 mb-7"
             >
-              <img
-                src="/TenTen Lottie Animation Blink Smile.gif"
-                alt="TenTen"
-                className="h-20 w-20 object-contain mb-1"
-              />
+              <BrandMark showWordmark={false} size="xl" className="mb-1" />
               <p className="text-2xl font-black tracking-tight text-center text-foreground">
                 {BRAND.name}
               </p>
@@ -358,7 +355,7 @@ export default function SignupPage() {
           </div>
 
           {/* Footer */}
-          <div className="px-8 py-4 border-t border-border/40 bg-muted/20 flex items-center justify-between">
+          <div className="px-8 py-4 border-t border-border/40 bg-muted/20 flex items-center justify-center">
             <p className="text-xs text-muted-foreground">
               Already have access?{" "}
               <Link
@@ -367,9 +364,6 @@ export default function SignupPage() {
               >
                 Sign in
               </Link>
-            </p>
-            <p className="text-xs text-muted-foreground/30 tracking-wide">
-              Built by the creators of TenTen
             </p>
           </div>
         </div>

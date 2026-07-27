@@ -82,7 +82,7 @@ export function SelectorScreen({ dashboards, profile }: SelectorScreenProps) {
           <div className="mb-6 text-center">
             <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 text-xs text-primary font-medium mb-3">
               <Sparkles className="h-3 w-3" />
-              TenTen-Powered Analytics
+              AI-Powered Analytics
             </div>
             <h1 className="text-2xl font-bold text-foreground tracking-tight">Select a Dashboard</h1>
             <p className="text-sm text-muted-foreground mt-1.5">

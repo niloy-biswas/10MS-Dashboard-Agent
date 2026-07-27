@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -19,6 +18,7 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { BRAND } from "@/lib/brand";
+import { BrandMark } from "@/components/brand-mark";
 import type { Profile } from "@/lib/types";
 
 interface AdminLayoutShellProps {
@@ -89,9 +89,7 @@ export function AdminLayoutShell({ profile, isAdmin, children }: AdminLayoutShel
       <aside className="w-64 shrink-0 h-screen bg-sidebar border-r border-sidebar-border flex flex-col overflow-hidden">
         <div className="px-5 py-5 border-b border-border/40">
           <div className="flex items-center gap-2.5">
-            <div className="h-7 w-7 rounded-lg overflow-hidden shrink-0">
-              <Image src="/10ms-logo.png" alt="10MS" width={28} height={28} className="object-cover w-full h-full" />
-            </div>
+            <BrandMark showWordmark={false} size="sm" />
             <div>
               <p className="text-xs font-bold text-foreground tracking-wide uppercase">{BRAND.name}</p>
               <p className="text-xs text-muted-foreground">{BRAND.productLabel}</p>

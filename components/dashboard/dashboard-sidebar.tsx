@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, BarChart2, Filter, Info, ExternalLink, Clock, Plus, MessageSquare, Loader2 } from "lucide-react";
-import Image from "next/image";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { UserAvatar } from "@/components/auth/user-avatar";
+import { BrandMark } from "@/components/brand-mark";
 import { BRAND } from "@/lib/brand";
 import type { Dashboard, Profile, ChatSession } from "@/lib/types";
 
@@ -189,9 +189,7 @@ export function DashboardSidebar({ dashboard, profile, sessions = [], currentSes
       {/* Brand */}
       <div className="px-5 py-5 border-b border-border/40">
         <div className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-lg overflow-hidden shrink-0">
-            <Image src="/10ms-logo.png" alt="10MS" width={28} height={28} className="object-cover w-full h-full" />
-          </div>
+          <BrandMark showWordmark={false} size="sm" />
           <div>
               <p className="text-xs font-bold text-foreground tracking-wide uppercase">{BRAND.name}</p>
               <p className="text-xs text-muted-foreground">{BRAND.productLabel}</p>

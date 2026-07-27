@@ -376,7 +376,7 @@ export default function DataSourcesSettingsPage() {
                   resetCreateTest();
                 }}
                 className="w-full h-10 px-3 rounded-lg bg-input border border-border text-sm"
-                placeholder="10MS Production BQ"
+                placeholder="Production BigQuery"
               />
             </div>
             <div className="space-y-1.5">

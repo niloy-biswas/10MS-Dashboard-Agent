@@ -13,7 +13,7 @@ export function CredibilityStrip() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-10">
         <p className="text-sm text-muted-foreground text-center mb-5">
           Built from real analytics workflows at{" "}
-          <span className="text-foreground font-medium">10 Minute School</span>.
+          <span className="text-foreground font-medium">your organization</span>.
         </p>
         <ul className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           {INTEGRATION_LABELS.map((label) => (

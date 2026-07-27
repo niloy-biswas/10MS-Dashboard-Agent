@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { Sparkles, Share2, Copy, Check, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { BrandMark } from "@/components/brand-mark";
 import type { Dashboard, ChatSession } from "@/lib/types";
 
 interface ChatHeaderProps {
@@ -50,7 +51,7 @@ function SharePanel({ session, onClose }: { session: ChatSession; onClose: () =>
 
       <div className="flex items-center justify-between p-3 bg-muted/50 rounded-xl mb-3">
         <div>
-          <p className="text-xs font-medium text-foreground">Share with 10MS team</p>
+          <p className="text-xs font-medium text-foreground">Share with your team</p>
           <p className="text-xs text-muted-foreground mt-0.5">Anyone with an account can view</p>
         </div>
         <button
@@ -135,11 +136,7 @@ export function EmptyState({ dashboardId, dashboardName, purpose }: { dashboardI
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="flex flex-col items-center gap-4 text-center max-w-sm"
       >
-        <img
-          src="/TenTen Lottie Animation Blink Smile.gif"
-          alt="TenTen"
-          className="h-24 w-24 object-contain"
-        />
+        <BrandMark showWordmark={false} size="xl" />
         <div>
           <p className="text-xs text-muted-foreground/50 font-mono">{dashboardId}</p>
           <h2 className="text-lg font-semibold text-foreground mt-0.5">
@@ -151,10 +148,7 @@ export function EmptyState({ dashboardId, dashboardName, purpose }: { dashboardI
             </p>
           )}
           <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-            Ask any analytical question and get TenTen-powered insights instantly.
-          </p>
-          <p className="text-xs text-muted-foreground/40 mt-3 tracking-wide">
-            Built by the creators of TenTen
+            Ask any analytical question and get AI-powered insights instantly.
           </p>
         </div>
       </motion.div>
