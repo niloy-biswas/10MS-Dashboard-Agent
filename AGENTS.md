@@ -2,7 +2,7 @@
 
 Compact orientation for coding agents. Read this before large changes.
 
-Product brand: **Average Analyst** (`lib/brand.ts`: name, tagline, `supportEmail`, `githubUrl`, `marketingPrimaryCta`, `contactMailto`). Public marketing at **`/`**; authenticated product home at **`/app`**.
+Product brand: **Average Analyst** (`lib/brand.ts`: name, tagline, `supportEmail`, `githubUrl`, `marketingPrimaryCta`, `contactMailto`). Shared mark: **`components/brand-mark.tsx`**. Public marketing at **`/`**; authenticated product home at **`/app`**.
 
 ## What this is
 

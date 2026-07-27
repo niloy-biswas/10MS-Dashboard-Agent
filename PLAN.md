@@ -85,7 +85,7 @@ Target over time: small numbered migrations only (no one-off “run this in SQL 
 
 ## Reference — admin UI design
 
-Admin uses the same stack as chat: shadcn-style `components/ui/`, tokens from `globals.css`, `ThemeProvider`, Lucide, Inter + Noto Bengali. Shell: `components/admin/admin-layout-shell.tsx`. Prefer **no** hardcoded colors outside existing tokens (e.g. brand primary token — name may still be `--10ms-red` in CSS until rebranding).
+Admin uses the same stack as chat: shadcn-style `components/ui/`, tokens from `globals.css`, `ThemeProvider`, Lucide, Inter + Noto Bengali. Shell: `components/admin/admin-layout-shell.tsx`. Prefer **no** hardcoded colors outside existing tokens (e.g. `--brand-red`, `--chart-primary` in `globals.css`).
 
 ---
 
@@ -140,7 +140,7 @@ Admin uses the same stack as chat: shadcn-style `components/ui/`, tokens from `g
 
 Differentiator: **governed analytics context** (registry, draft/publish, rules, approved tables, data sources) — not generic “chat with warehouse.” Self-hosted posture similar to n8n is a goal.
 
-**Open-source prerequisites (remaining examples):** external validation on self-hosted builds, optional extra warehouse connectors, neutral branding/docs, Docker path above, stable 10MS dogfood (if that fork remains).
+**Open-source prerequisites (remaining examples):** external validation on self-hosted builds, optional extra warehouse connectors, neutral branding/docs, Docker path above.
 
 ### Competitive landscape (reference)
 
