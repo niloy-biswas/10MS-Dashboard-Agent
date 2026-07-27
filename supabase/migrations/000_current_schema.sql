@@ -294,8 +294,8 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 begin
-  if new.email not like '%@10minuteschool.com' then
-    raise exception 'Only @10minuteschool.com email addresses are allowed.';
+  if new.email not like '%@yourdomain.com' then
+    raise exception 'Only @yourdomain.com email addresses are allowed.';
   end if;
   return new;
 end;

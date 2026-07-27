@@ -1,5 +1,5 @@
 -- ============================================================
--- 10MS Analytics Assistant — Supabase Schema & Seed Data
+-- Average Analyst — Supabase Schema & Seed Data
 -- Run this in the Supabase SQL Editor
 -- ============================================================
 
@@ -40,8 +40,8 @@ create policy "Public read profiles"   on profiles    for select using (true);
 -- SEED: Profiles
 -- ============================================================
 insert into profiles (name, email, role) values
-  ('Niloy Biswas',   'niloy@10minuteschool.com',   'Data Lead'),
-  ('Farhan Ahmed',   'farhanur@10minuteschool.com',   'Senior Analyst')
+  ('Alex Smith',   'alex@example.com',   'Data Lead'),
+  ('Jordan Lee',   'jordan@example.com',   'Senior Analyst')
 on conflict (email) do nothing;
 
 -- ============================================================
@@ -57,10 +57,10 @@ values
   ('G35', 'Traffic Performance', 'Product', null, 'https://lookerstudio.google.com/u/0/reporting/ae1ff967-7444-40de-a3e3-c5bef8bf7910', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
   ('G82', 'Inbound & Outbound [Updated Logic]', 'Sales & Marketing', null, 'https://lookerstudio.google.com/u/0/reporting/1c54e89a-5f8c-4693-bad2-e6031553a403', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
   ('G85', 'Promo Creation Dashboard', 'Product', null, 'https://lookerstudio.google.com/u/0/reporting/2252d7ca-535c-450c-ae5d-a678bc070b0b', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
-  ('G90', 'Platform Features & TenTen', 'Product', null, 'https://lookerstudio.google.com/u/0/reporting/fb17b950-f26d-4b12-bf11-09f063dec147', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
+  ('G90', 'Platform Features', 'Product', null, 'https://lookerstudio.google.com/u/0/reporting/fb17b950-f26d-4b12-bf11-09f063dec147', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
   ('G92', 'HSC 26', 'Product & Content', null, 'https://lookerstudio.google.com/u/0/reporting/7c72695f-46cc-418d-a2a6-f591baba796d', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
   ('G98', 'Comment Spamming - Analysis', 'Academics', null, 'https://lookerstudio.google.com/u/0/reporting/1a716620-9c6b-452d-b469-8e681fa738e2', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
-  ('G99', '10MS English Centre', 'Offline', null, 'https://lookerstudio.google.com/u/0/reporting/3b9c7df5-f8e3-4168-95a5-b23245fdc266', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
+  ('G99', 'English Centre', 'Offline', null, 'https://lookerstudio.google.com/u/0/reporting/3b9c7df5-f8e3-4168-95a5-b23245fdc266', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
   ('G103', 'HSC 27', 'Product & Content', null, 'https://lookerstudio.google.com/u/0/reporting/5b8508f4-6c6a-43a9-9149-4a726f877d5a', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
   ('G106', 'Free Course Summary', 'Academics', null, 'https://lookerstudio.google.com/u/0/reporting/09f4fd0c-ce90-4898-999e-af97c617d3a5', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]),
   ('G107', 'OB 26 (6-10)', 'Academics', 'Everything about OB26', 'https://lookerstudio.google.com/u/0/reporting/8c870296-188c-45aa-bbd2-d5aa673a7461', 'Daily', null, ARRAY[]::text[], ARRAY[]::text[]);
@@ -222,10 +222,10 @@ insert into dashboard_tables (dashboard_id, table_name, row_count, description, 
   ('G99', 'raw_product_content.auth_users_v3', '19.7M', 'User registration data view — all platform users with auth details.', 'Large table'),
   ('G106', 'raw_product_content.freeclass_overview_V3', '50', 'Free class summary overview — high-level metrics for free courses.', 'Small summary table'),
   ('G99', 'raw_product_content.offline_free_class_cx', '270K', 'Offline free class customer experience/feedback records.', null),
-  ('G90', 'raw_product_content.tentenai_locations_v3', '10.1K', 'TenTen AI user location data — where users access the AI doubt solver from.', null),
-  ('G90', 'raw_product_content.tentenai_messages_v3', '186K', 'TenTen AI conversation logs — all agent/user messages across modes (academic, exam, liveclass, recorded). Includes per-response cost and evaluation scores. **Primary table for any TenTen analysis.**', null),
-  ('G103', 'raw_product_content.tentenai_messages_v3', '186K', 'TenTen AI conversation logs — all agent/user messages across modes (academic, exam, liveclass, recorded). Includes per-response cost and evaluation scores. **Primary table for any TenTen analysis.**', null),
-  ('G107', 'raw_product_content.tentenai_messages_v3', '186K', 'TenTen AI conversation logs — all agent/user messages across modes (academic, exam, liveclass, recorded). Includes per-response cost and evaluation scores. **Primary table for any TenTen analysis.**', null),
-  ('G90', 'raw_product_content.tentenai_model_usages_v3', '679K', 'TenTen AI LLM model usage — token counts, costs, model versions per request.', null),
+  ('G90', 'raw_product_content.tentenai_locations_v3', '10.1K', 'AI feature user location data — where users access the AI assistant from.', null),
+  ('G90', 'raw_product_content.tentenai_messages_v3', '186K', 'AI assistant conversation logs — all agent/user messages across modes. Includes per-response cost and evaluation scores. **Primary table for AI usage analysis.**', null),
+  ('G103', 'raw_product_content.tentenai_messages_v3', '186K', 'AI assistant conversation logs — all agent/user messages across modes. Includes per-response cost and evaluation scores. **Primary table for AI usage analysis.**', null),
+  ('G107', 'raw_product_content.tentenai_messages_v3', '186K', 'AI assistant conversation logs — all agent/user messages across modes. Includes per-response cost and evaluation scores. **Primary table for AI usage analysis.**', null),
+  ('G90', 'raw_product_content.tentenai_model_usages_v3', '679K', 'AI LLM model usage — token counts, costs, model versions per request.', null),
   ('G33', 'raw_transaction.transaction_export_all_view_v3', '1.02M', 'Raw transaction export view — all transactions with payment and product details.', null),
   ('G92', 'sm_report.revenue_recognition_model_v3', '448K', 'Revenue recognition model — distributes revenue across recognition periods.', null);
