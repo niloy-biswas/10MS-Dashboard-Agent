@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 
 const SERIES_COLORS = [
   "var(--primary)",
-  "var(--10ms-blue)",
+  "var(--chart-primary)",
   "var(--muted-foreground)",
   "hsl(var(--chart-4, 160 60% 45%))",
 ];

@@ -312,7 +312,7 @@ export function HeroDemo() {
                             />
                             <Bar
                               dataKey="enrolments"
-                              fill="var(--10ms-blue)"
+                              fill="var(--chart-primary)"
                               opacity={0.35}
                               radius={[4, 4, 0, 0]}
                               isAnimationActive={!reduced}

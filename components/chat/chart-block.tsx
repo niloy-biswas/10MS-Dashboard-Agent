@@ -58,13 +58,13 @@ export interface ChartSpec {
 }
 
 const CHART_COLORS = [
-  "#4f8ef7", // 10MS blue
+  "#4f8ef7",
   "#10b981", // emerald
   "#f59e0b", // amber
   "#a855f7", // purple
   "#ec4899", // pink
   "#06b6d4", // cyan
-  "#e53935", // 10MS red
+  "#e53935",
 ];
 
 function toLabel(key: string) {

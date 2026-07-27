@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { BrandMark } from "@/components/marketing/brand-mark";
+import { BrandMark } from "@/components/brand-mark";
 import { GitHubIcon } from "@/components/marketing/github-icon";
 import { MARKETING_NAV } from "@/components/marketing/config";
 import { BRAND, marketingPrimaryCta } from "@/lib/brand";

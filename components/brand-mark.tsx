@@ -2,6 +2,13 @@ import { Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BRAND } from "@/lib/brand";
 
+const SIZES = {
+  sm: { box: "h-7 w-7", icon: "h-3.5 w-3.5", radius: "rounded-lg" },
+  md: { box: "h-8 w-8", icon: "h-4 w-4", radius: "rounded-lg" },
+  lg: { box: "h-12 w-12", icon: "h-6 w-6", radius: "rounded-xl" },
+  xl: { box: "h-20 w-20", icon: "h-10 w-10", radius: "rounded-2xl" },
+} as const;
+
 export function BrandMark({
   className,
   showWordmark = true,
@@ -9,17 +16,17 @@ export function BrandMark({
 }: {
   className?: string;
   showWordmark?: boolean;
-  size?: "sm" | "md";
+  size?: keyof typeof SIZES;
 }) {
-  const box = size === "sm" ? "h-7 w-7" : "h-8 w-8";
-  const icon = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
+  const { box, icon, radius } = SIZES[size];
 
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <span
         className={cn(
           box,
-          "rounded-lg bg-primary flex items-center justify-center shadow-[0_0_14px_var(--primary-glow)] shrink-0"
+          radius,
+          "bg-primary flex items-center justify-center shadow-[0_0_14px_var(--primary-glow)] shrink-0"
         )}
         aria-hidden
       >

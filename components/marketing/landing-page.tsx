@@ -24,8 +24,8 @@ export function LandingPageView({ isLoggedIn }: { isLoggedIn: boolean }) {
     <div className="min-h-screen flex flex-col relative overflow-x-hidden bg-background text-foreground">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         <div className="absolute top-[-18%] left-1/2 -translate-x-1/2 w-[720px] h-[480px] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute top-[35%] right-[-10%] w-[420px] h-[420px] rounded-full bg-[var(--10ms-blue-glow)] blur-[100px]" />
-        <div className="absolute bottom-[10%] left-[-5%] w-[320px] h-[320px] rounded-full bg-[var(--10ms-red-glow)] blur-[90px]" />
+        <div className="absolute top-[35%] right-[-10%] w-[420px] h-[420px] rounded-full bg-[var(--chart-primary-glow)] blur-[100px]" />
+        <div className="absolute bottom-[10%] left-[-5%] w-[320px] h-[320px] rounded-full bg-[var(--brand-red-glow)] blur-[90px]" />
       </div>
 
       <LandingHeader isLoggedIn={isLoggedIn} />
