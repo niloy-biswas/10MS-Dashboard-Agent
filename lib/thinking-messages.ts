@@ -4,7 +4,7 @@ export const THINKING_MESSAGES = [
   "Consulting the data team's brain...",
   "On it, boss...",
   "Running it through the BI brain...",
-  "10MS data machine warming up...",
+  "Data machine warming up...",
   "Figuring this out faster than a 10-minute class...",
   "Processing... this better be worth it...",
   "Reading the context...",
