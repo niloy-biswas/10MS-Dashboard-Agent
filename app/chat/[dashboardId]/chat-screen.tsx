@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,16 +24,27 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
   const router = useRouter();
   const { messages, isStreaming, error, sendMessage } = useChat(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const userScrolledUpRef = useRef(false);
   const prevMessageCountRef = useRef(messages.length);
   const [localSessions, setLocalSessions] = useState<ChatSession[]>(sessions);
   const [navigatingBack, setNavigatingBack] = useState(false);
 
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    userScrolledUpRef.current = el.scrollHeight - el.scrollTop - el.clientHeight > 80;
+  }, []);
+
   useEffect(() => {
     const isNewMessage = messages.length !== prevMessageCountRef.current;
     prevMessageCountRef.current = messages.length;
-    bottomRef.current?.scrollIntoView({
-      behavior: isNewMessage ? "smooth" : "instant",
-    });
+    if (isNewMessage) {
+      userScrolledUpRef.current = false;
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    } else if (!userScrolledUpRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "instant" });
+    }
   }, [messages]);
 
   const handleSend = (text: string) => {
@@ -83,7 +94,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
         {/* Header */}
         <div className="relative z-10 flex items-center border-b border-border bg-card/80 backdrop-blur-md">
           <button
-            onClick={() => { setNavigatingBack(true); router.push("/"); }}
+            onClick={() => { setNavigatingBack(true); router.push("/app"); }}
             disabled={navigatingBack}
             className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border-r border-border disabled:opacity-60"
           >
@@ -114,7 +125,7 @@ export function ChatScreen({ dashboard, profile, session, sessions, initialMessa
         </AnimatePresence>
 
         {/* Messages */}
-        <div className="relative z-10 flex-1 overflow-y-auto">
+        <div ref={scrollContainerRef} onScroll={handleScroll} className="relative z-10 flex-1 overflow-y-auto">
           {isEmpty ? (
             <EmptyState dashboardId={dashboard.dashboard_id} dashboardName={dashboard.dashboard_name} purpose={dashboard.purpose} />
           ) : (

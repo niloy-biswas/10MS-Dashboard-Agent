@@ -3,10 +3,10 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/require-role";
 import {
   adminDeleteDataSource,
-  adminGetDataSourceFull,
+  adminResolveDataSourceCredentials,
   adminUpdateBigQueryDataSource,
 } from "@/lib/supabase/admin-queries";
-import { decryptSecret, isEncryptionConfigured } from "@/lib/secrets/credentials-crypto";
+import { isEncryptionConfigured } from "@/lib/secrets/credentials-crypto";
 import { testBigQueryConnection } from "@/lib/admin/test-connections";
 
 const updateSchema = z.object({
@@ -36,17 +36,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    let credentialsJson = body.credentials_json?.trim();
-    if (!credentialsJson) {
-      const existing = await adminGetDataSourceFull(id);
-      if (!existing?.credentials_encrypted) {
-        return NextResponse.json(
-          { error: "No stored credentials found. Paste service account JSON before saving." },
-          { status: 400 }
-        );
-      }
-      credentialsJson = decryptSecret(existing.credentials_encrypted);
-    }
+    const credentialsJson = await adminResolveDataSourceCredentials(id, body.credentials_json);
 
     await testBigQueryConnection({
       projectId: body.project_id,
@@ -71,8 +61,9 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (status === 401 || status === 403) {
       return NextResponse.json({ error: "Forbidden" }, { status });
     }
+    const msg = e instanceof Error ? e.message : "Failed to update data source";
     console.error(e);
-    return NextResponse.json({ error: "Failed to update data source" }, { status: 500 });
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 }
 

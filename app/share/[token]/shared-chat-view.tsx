@@ -20,7 +20,7 @@ export function SharedChatView({ session, dashboard, messages }: SharedChatViewP
       {/* Header */}
       <div className="flex items-center border-b border-border bg-card/80 backdrop-blur-md shrink-0">
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/app")}
           className="h-14 px-4 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border-r border-border"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -41,7 +41,7 @@ export function SharedChatView({ session, dashboard, messages }: SharedChatViewP
             <ThemeToggle />
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground border border-border rounded-full px-3 py-1.5">
               <Lock className="h-3 w-3" />
-              Read-only · 10MS Internal
+              Read-only · Shared session
             </div>
           </div>
         </div>

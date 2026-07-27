@@ -36,10 +36,10 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-10ms-red: var(--10ms-red);
-  --color-10ms-red-glow: var(--10ms-red-glow);
-  --color-10ms-blue: var(--10ms-blue);
-  --color-10ms-blue-glow: var(--10ms-blue-glow);
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-glow: var(--brand-red-glow);
+  --color-chart-primary: var(--chart-primary);
+  --color-chart-primary-glow: var(--chart-primary-glow);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -78,11 +78,11 @@
   --sidebar-ring: rgba(59, 111, 212, 0.25);
   --primary-glow: rgba(59, 111, 212, 0.4);
 
-  /* 10MS brand colors */
-  --10ms-red: #e53935;
-  --10ms-red-glow: rgba(229, 57, 53, 0.2);
-  --10ms-blue: #4f8ef7;
-  --10ms-blue-glow: rgba(79, 142, 247, 0.15);
+  /* Brand accent colors */
+  --brand-red: #e53935;
+  --brand-red-glow: rgba(229, 57, 53, 0.2);
+  --chart-primary: #4f8ef7;
+  --chart-primary-glow: rgba(79, 142, 247, 0.15);
   --grid-line: rgba(0, 0, 0, 0.06);
 }
 
@@ -116,11 +116,11 @@
   --sidebar-ring: rgba(229, 57, 53, 0.3);
   --primary-glow: rgba(229, 57, 53, 0.4);
 
-  /* 10MS brand colors */
-  --10ms-red: #e53935;
-  --10ms-red-glow: rgba(229, 57, 53, 0.25);
-  --10ms-blue: #4f8ef7;
-  --10ms-blue-glow: rgba(79, 142, 247, 0.2);
+  /* Brand accent colors */
+  --brand-red: #e53935;
+  --brand-red-glow: rgba(229, 57, 53, 0.25);
+  --chart-primary: #4f8ef7;
+  --chart-primary-glow: rgba(79, 142, 247, 0.2);
   --grid-line: rgba(255, 255, 255, 0.025);
 }
 

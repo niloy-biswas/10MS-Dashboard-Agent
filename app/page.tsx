@@ -1,20 +1,31 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { getDashboards, getProfileByEmail } from "@/lib/supabase/queries";
-import { SelectorScreen } from "./selector-screen";
+import { LandingPageView } from "@/components/marketing/landing-page";
+import { BRAND } from "@/lib/brand";
 
-export default async function HomePage() {
+export const metadata: Metadata = {
+  title: {
+    absolute: `${BRAND.name}: Governed AI Analytics`,
+  },
+  description: BRAND.description,
+  openGraph: {
+    title: BRAND.tagline,
+    description: BRAND.ogDescription,
+    type: "website",
+    siteName: BRAND.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: BRAND.tagline,
+    description: BRAND.ogDescription,
+  },
+};
+
+export default async function LandingPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
-
-  const [dashboards, profile] = await Promise.all([
-    getDashboards(),
-    getProfileByEmail(user.email!),
-  ]);
-
-  return <SelectorScreen dashboards={dashboards} profile={profile} />;
+  return <LandingPageView isLoggedIn={!!user} />;
 }

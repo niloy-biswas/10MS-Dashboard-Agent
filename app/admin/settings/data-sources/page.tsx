@@ -23,6 +23,15 @@ interface DataSourceEditState {
   credentials_json: string;
 }
 
+function emptyEdit(item: DataSourceRow): DataSourceEditState {
+  return {
+    label: item.label,
+    project_id: item.project_id,
+    location: item.location ?? "US",
+    credentials_json: "",
+  };
+}
+
 export default function DataSourcesSettingsPage() {
   const [items, setItems] = useState<DataSourceRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,10 +44,36 @@ export default function DataSourcesSettingsPage() {
   const [createTestMessage, setCreateTestMessage] = useState<string | null>(null);
   const [edits, setEdits] = useState<Record<string, DataSourceEditState>>({});
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [testingId, setTestingId] = useState<string | null>(null);
+  const [testMessages, setTestMessages] = useState<Record<string, string>>({});
 
   function resetCreateTest() {
     setCreateTestStatus("idle");
     setCreateTestMessage(null);
+  }
+
+  function clearExistingTestMessage(id: string) {
+    setTestMessages((prev) => {
+      if (!(id in prev)) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  function patchEdit(
+    id: string,
+    ds: DataSourceRow,
+    patch: Partial<DataSourceEditState>
+  ) {
+    clearExistingTestMessage(id);
+    setEdits((prev) => ({
+      ...prev,
+      [id]: {
+        ...(prev[id] ?? emptyEdit(ds)),
+        ...patch,
+      },
+    }));
   }
 
   const load = useCallback(async () => {
@@ -54,17 +89,7 @@ export default function DataSourcesSettingsPage() {
     const nextItems = (data.data_sources ?? []) as DataSourceRow[];
     setItems(nextItems);
     setEdits(
-      Object.fromEntries(
-        nextItems.map((item) => [
-          item.id,
-          {
-            label: item.label,
-            project_id: item.project_id,
-            location: item.location ?? "US",
-            credentials_json: "",
-          },
-        ])
-      )
+      Object.fromEntries(nextItems.map((item) => [item.id, emptyEdit(item)]))
     );
     setLoading(false);
   }, []);
@@ -121,7 +146,7 @@ export default function DataSourcesSettingsPage() {
     if (!res.ok) {
       setCreateTestStatus("idle");
       setCreateTestMessage(null);
-      setError(data.error ?? "Connection test failed");
+      setError(typeof data.error === "string" ? data.error : "Connection test failed");
       return;
     }
     setCreateTestStatus("success");
@@ -133,6 +158,7 @@ export default function DataSourcesSettingsPage() {
     if (!edit) return;
     setBusyId(id);
     setError(null);
+    clearExistingTestMessage(id);
     const res = await fetch(`/api/admin/settings/data-sources/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -147,6 +173,43 @@ export default function DataSourcesSettingsPage() {
     await load();
   }
 
+  async function handleExistingTest(id: string) {
+    const edit = edits[id];
+    if (!edit) return;
+    setTestingId(id);
+    setError(null);
+    clearExistingTestMessage(id);
+    const res = await fetch("/api/admin/settings/data-sources/test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        project_id: edit.project_id,
+        location: edit.location,
+        credentials_json: edit.credentials_json.trim() || undefined,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setTestingId(null);
+    if (!res.ok) {
+      setError(typeof data.error === "string" ? data.error : "Connection test failed");
+      return;
+    }
+    const lastTestedAt =
+      typeof data.last_tested_at === "string" ? data.last_tested_at : new Date().toISOString();
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, status: "connected", last_tested_at: lastTestedAt }
+          : item
+      )
+    );
+    setTestMessages((prev) => ({
+      ...prev,
+      [id]: "Connection test passed.",
+    }));
+  }
+
   async function handleDelete(id: string) {
     if (!confirm("Delete this data source? Dashboards must not reference it.")) return;
     setBusyId(id);
@@ -155,7 +218,7 @@ export default function DataSourcesSettingsPage() {
     setBusyId(null);
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
-      setError(j.error ?? "Delete failed");
+      setError(typeof j.error === "string" ? j.error : "Delete failed");
       return;
     }
     await load();
@@ -182,7 +245,8 @@ export default function DataSourcesSettingsPage() {
         <CardHeader>
           <CardTitle className="text-base">Connected sources</CardTitle>
           <CardDescription>
-            New sources must pass <span className="font-mono">SELECT 1</span> before they are saved.
+            Re-test any source with <span className="font-mono">SELECT 1</span>. New sources must
+            pass the same check before they are saved.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -192,126 +256,99 @@ export default function DataSourcesSettingsPage() {
             <p className="text-sm text-muted-foreground">No data sources yet.</p>
           ) : (
             <ul className="space-y-3">
-              {items.map((ds) => (
-                <li
-                  key={ds.id}
-                  className="rounded-lg border border-border/60 bg-card/50 p-3 space-y-3"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <p className="text-sm font-medium">{ds.label}</p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        {ds.project_id} · {ds.location ?? "US"}
+              {items.map((ds) => {
+                const rowBusy = busyId === ds.id || testingId === ds.id;
+                const edit = edits[ds.id] ?? emptyEdit(ds);
+                return (
+                  <li
+                    key={ds.id}
+                    className="rounded-lg border border-border/60 bg-card/50 p-3 space-y-3"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium">{ds.label}</p>
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {ds.project_id} · {ds.location ?? "US"}
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {ds.type} · {ds.status}
+                        {ds.last_tested_at
+                          ? ` · tested ${new Date(ds.last_tested_at).toLocaleString()}`
+                          : ""}
                       </p>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {ds.type} · {ds.status}
-                      {ds.last_tested_at
-                        ? ` · tested ${new Date(ds.last_tested_at).toLocaleString()}`
-                        : ""}
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input
-                      value={edits[ds.id]?.label ?? ds.label}
-                      onChange={(e) =>
-                        setEdits((prev) => ({
-                          ...prev,
-                          [ds.id]: {
-                            ...(prev[ds.id] ?? {
-                              label: ds.label,
-                              project_id: ds.project_id,
-                              location: ds.location ?? "US",
-                              credentials_json: "",
-                            }),
-                            label: e.target.value,
-                          },
-                        }))
-                      }
-                      className="h-9 px-3 rounded-md bg-input border border-border text-sm"
-                      placeholder="Label"
-                    />
-                    <input
-                      value={edits[ds.id]?.project_id ?? ds.project_id}
-                      onChange={(e) =>
-                        setEdits((prev) => ({
-                          ...prev,
-                          [ds.id]: {
-                            ...(prev[ds.id] ?? {
-                              label: ds.label,
-                              project_id: ds.project_id,
-                              location: ds.location ?? "US",
-                              credentials_json: "",
-                            }),
-                            project_id: e.target.value,
-                          },
-                        }))
-                      }
-                      className="h-9 px-3 rounded-md bg-input border border-border text-sm font-mono"
-                      placeholder="Project ID"
-                    />
-                    <input
-                      value={edits[ds.id]?.location ?? ds.location ?? "US"}
-                      onChange={(e) =>
-                        setEdits((prev) => ({
-                          ...prev,
-                          [ds.id]: {
-                            ...(prev[ds.id] ?? {
-                              label: ds.label,
-                              project_id: ds.project_id,
-                              location: ds.location ?? "US",
-                              credentials_json: "",
-                            }),
-                            location: e.target.value,
-                          },
-                        }))
-                      }
-                      className="h-9 px-3 rounded-md bg-input border border-border text-sm font-mono"
-                      placeholder="US"
-                    />
-                    <input
-                      type="password"
-                      value={edits[ds.id]?.credentials_json ?? ""}
-                      onChange={(e) =>
-                        setEdits((prev) => ({
-                          ...prev,
-                          [ds.id]: {
-                            ...(prev[ds.id] ?? {
-                              label: ds.label,
-                              project_id: ds.project_id,
-                              location: ds.location ?? "US",
-                              credentials_json: "",
-                            }),
-                            credentials_json: e.target.value,
-                          },
-                        }))
-                      }
-                      className="h-9 px-3 rounded-md bg-input border border-border text-sm md:col-span-3"
-                      placeholder="Optional: paste new service account JSON to replace stored credentials"
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      disabled={busyId === ds.id}
-                      onClick={() => handleUpdate(ds.id)}
-                    >
-                      Save changes
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      disabled={busyId === ds.id}
-                      onClick={() => handleDelete(ds.id)}
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  </div>
-                </li>
-              ))}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <input
+                        value={edit.label}
+                        onChange={(e) => patchEdit(ds.id, ds, { label: e.target.value })}
+                        className="h-9 px-3 rounded-md bg-input border border-border text-sm"
+                        placeholder="Label"
+                      />
+                      <input
+                        value={edit.project_id}
+                        onChange={(e) => patchEdit(ds.id, ds, { project_id: e.target.value })}
+                        className="h-9 px-3 rounded-md bg-input border border-border text-sm font-mono"
+                        placeholder="Project ID"
+                      />
+                      <input
+                        value={edit.location}
+                        onChange={(e) => patchEdit(ds.id, ds, { location: e.target.value })}
+                        className="h-9 px-3 rounded-md bg-input border border-border text-sm font-mono"
+                        placeholder="US"
+                      />
+                      <div className="md:col-span-3 space-y-1.5">
+                        <p className="text-xs text-muted-foreground">
+                          Service account key is already stored encrypted. Leave blank to keep it, or
+                          paste a new JSON key to replace it.
+                        </p>
+                        <input
+                          type="password"
+                          value={edit.credentials_json}
+                          onChange={(e) =>
+                            patchEdit(ds.id, ds, { credentials_json: e.target.value })
+                          }
+                          className="w-full h-9 px-3 rounded-md bg-input border border-border text-sm"
+                          placeholder="Paste new service account JSON only if replacing the stored key"
+                        />
+                      </div>
+                    </div>
+                    {testMessages[ds.id] ? (
+                      <p className="text-sm text-emerald-500">{testMessages[ds.id]}</p>
+                    ) : null}
+                    <div className="flex flex-wrap gap-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={rowBusy}
+                        onClick={() => handleExistingTest(ds.id)}
+                      >
+                        <FlaskConical className="size-3.5" />
+                        {testingId === ds.id ? "Testing..." : "Test connection"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={rowBusy}
+                        onClick={() => handleUpdate(ds.id)}
+                      >
+                        Save changes
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        disabled={rowBusy}
+                        onClick={() => handleDelete(ds.id)}
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </CardContent>
@@ -339,7 +376,7 @@ export default function DataSourcesSettingsPage() {
                   resetCreateTest();
                 }}
                 className="w-full h-10 px-3 rounded-lg bg-input border border-border text-sm"
-                placeholder="10MS Production BQ"
+                placeholder="Production BigQuery"
               />
             </div>
             <div className="space-y-1.5">

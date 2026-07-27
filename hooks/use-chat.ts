@@ -56,6 +56,45 @@ export function useChat(initialMessages: ChatMessage[] = []) {
         const normalize = (raw: string) =>
           raw.replace(/\\n/g, "\n").trim();
 
+        // Smooth display: drain received chars to screen at a controlled rate
+        const CHARS_PER_FRAME = 30;
+        let displayedSegLen = 0; // chars of segmentContent currently shown
+        let rafId: number | null = null;
+
+        const doDisplay = () => {
+          rafId = null;
+          if (displayedSegLen >= segmentContent.length) return;
+          displayedSegLen = Math.min(displayedSegLen + CHARS_PER_FRAME, segmentContent.length);
+          const rawSeg = segmentContent.slice(0, displayedSegLen);
+          const rawFull = streamedContent.slice(0, streamedContent.length - segmentContent.length + displayedSegLen);
+          const displaySeg = rawSeg.replace(/\\n/g, "\n");
+          const displayFull = rawFull.replace(/\\n/g, "\n").trim();
+          const displayParts = parts.map((p, i) =>
+            i === parts.length - 1 && p.type === "text"
+              ? { type: "text" as const, content: displaySeg }
+              : p
+          );
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? { ...m, content: displayFull, parts: displayParts, isStreaming: true, thinkingState: null }
+                : m
+            )
+          );
+          if (displayedSegLen < segmentContent.length) {
+            rafId = requestAnimationFrame(doDisplay);
+          }
+        };
+
+        const scheduleDisplay = () => {
+          if (rafId === null) rafId = requestAnimationFrame(doDisplay);
+        };
+
+        const flushDisplay = () => {
+          if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+          displayedSegLen = segmentContent.length;
+        };
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -78,9 +117,11 @@ export function useChat(initialMessages: ChatMessage[] = []) {
               };
 
               if (chunk.type === "tool_start" && chunk.tool) {
+                flushDisplay();
                 const newToolCall: ToolCall = { tool: chunk.tool, input: chunk.input ?? {} };
                 parts = [...parts, { type: "tool_call", toolCall: newToolCall }];
                 segmentContent = "";
+                displayedSegLen = 0;
                 setMessages((prev) =>
                   prev.map((m) => m.id === assistantId ? { ...m, parts } : m)
                 );
@@ -116,29 +157,20 @@ export function useChat(initialMessages: ChatMessage[] = []) {
               } else if (chunk.type === "item" && chunk.content) {
                 segmentContent += chunk.content;
                 streamedContent += chunk.content;
-                const liveSegment = normalize(segmentContent);
-                const fullContent = normalize(streamedContent);
 
                 const lastPart = parts[parts.length - 1];
-                if (lastPart?.type === "text") {
-                  parts = [...parts.slice(0, -1), { type: "text", content: liveSegment }];
-                } else {
-                  parts = [...parts, { type: "text", content: liveSegment }];
+                if (lastPart?.type !== "text") {
+                  parts = [...parts, { type: "text", content: "" }];
                 }
-                setMessages((prev) =>
-                  prev.map((m) =>
-                    m.id === assistantId
-                      ? { ...m, content: fullContent, parts, isStreaming: true, thinkingState: null }
-                      : m
-                  )
-                );
+                scheduleDisplay();
 
               } else if (chunk.type === "error") {
                 streamDone = true;
+                flushDisplay();
                 setMessages((prev) =>
                   prev.map((m) =>
                     m.id === assistantId
-                      ? { ...m, content: streamedContent, isStreaming: false, hasError: true }
+                      ? { ...m, content: normalize(streamedContent), isStreaming: false, hasError: true }
                       : m
                   )
                 );
@@ -148,10 +180,11 @@ export function useChat(initialMessages: ChatMessage[] = []) {
           }
         }
 
+        flushDisplay();
         finalContent = normalize(streamedContent);
 
         setMessages((prev) =>
-          prev.map((m) => m.id === assistantId ? { ...m, isStreaming: false } : m)
+          prev.map((m) => m.id === assistantId ? { ...m, content: finalContent, isStreaming: false } : m)
         );
 
         if (payload.session_id && payload.user?.id) {

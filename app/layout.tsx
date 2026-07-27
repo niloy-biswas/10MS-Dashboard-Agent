@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Noto_Sans_Bengali, Noto_Sans_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { BRAND } from "@/lib/brand";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,8 +25,12 @@ const notoSansMono = Noto_Sans_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "10MS Analytics Assistant",
-  description: "Internal analytics intelligence platform for 10 Minute School",
+  title: {
+    default: `${BRAND.name}: Governed AI Analytics`,
+    template: `%s · ${BRAND.name}`,
+  },
+  description: BRAND.description,
+  applicationName: BRAND.name,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
