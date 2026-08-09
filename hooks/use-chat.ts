@@ -3,6 +3,43 @@
 import { useState, useCallback } from "react";
 import type { ChatMessage, ChatPayload, MessagePart, ToolCall } from "@/lib/types";
 
+const INCOMPLETE_TOOL_OUTPUT = "Tool did not complete successfully.";
+
+/** Normalize text parts and mark tools that never received tool_end as errors. */
+function finalizePartsForSave(parts: MessagePart[]): MessagePart[] {
+  return parts.map((p) => {
+    if (p.type === "text") {
+      return { type: "text" as const, content: p.content.replace(/\\n/g, "\n").trim() };
+    }
+    if (!p.toolCall.output && !p.toolCall.isError) {
+      return {
+        type: "tool_call" as const,
+        toolCall: {
+          ...p.toolCall,
+          output: INCOMPLETE_TOOL_OUTPUT,
+          isError: true,
+        },
+      };
+    }
+    return p;
+  });
+}
+
+function findOpenToolCallIndex(parts: MessagePart[], toolName: string): number {
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const part = parts[i];
+    if (
+      part?.type === "tool_call" &&
+      part.toolCall.tool === toolName &&
+      !part.toolCall.output &&
+      !part.toolCall.isError
+    ) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 export function useChat(initialMessages: ChatMessage[] = []) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -95,6 +132,18 @@ export function useChat(initialMessages: ChatMessage[] = []) {
           displayedSegLen = segmentContent.length;
         };
 
+        /** Persist the current text segment into `parts` (display RAF only updates React state). */
+        const commitSegmentToParts = () => {
+          if (!segmentContent) return;
+          const text = segmentContent.replace(/\\n/g, "\n");
+          const lastPart = parts[parts.length - 1];
+          if (lastPart?.type === "text") {
+            parts = [...parts.slice(0, -1), { type: "text", content: text }];
+          } else {
+            parts = [...parts, { type: "text", content: text }];
+          }
+        };
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -114,10 +163,12 @@ export function useChat(initialMessages: ChatMessage[] = []) {
                 tool?: string;
                 input?: Record<string, unknown>;
                 output?: string;
+                isError?: boolean;
               };
 
               if (chunk.type === "tool_start" && chunk.tool) {
                 flushDisplay();
+                commitSegmentToParts();
                 const newToolCall: ToolCall = { tool: chunk.tool, input: chunk.input ?? {} };
                 parts = [...parts, { type: "tool_call", toolCall: newToolCall }];
                 segmentContent = "";
@@ -127,17 +178,19 @@ export function useChat(initialMessages: ChatMessage[] = []) {
                 );
 
               } else if (chunk.type === "tool_end" && chunk.tool) {
-                const idx = [...parts].reverse().findIndex(
-                  (p) => p.type === "tool_call" &&
-                    !(p as { type: "tool_call"; toolCall: ToolCall }).toolCall.output &&
-                    (p as { type: "tool_call"; toolCall: ToolCall }).toolCall.tool === chunk.tool
-                );
-                if (idx !== -1) {
-                  const realIdx = parts.length - 1 - idx;
-                  const existing = (parts[realIdx] as { type: "tool_call"; toolCall: ToolCall }).toolCall;
+                const realIdx = findOpenToolCallIndex(parts, chunk.tool);
+                const existing = realIdx >= 0 ? parts[realIdx] : undefined;
+                if (existing?.type === "tool_call") {
                   parts = [
                     ...parts.slice(0, realIdx),
-                    { type: "tool_call", toolCall: { ...existing, output: chunk.output } },
+                    {
+                      type: "tool_call",
+                      toolCall: {
+                        ...existing.toolCall,
+                        output: chunk.output ?? (chunk.isError ? "Tool failed" : ""),
+                        isError: chunk.isError || undefined,
+                      },
+                    },
                     ...parts.slice(realIdx + 1),
                   ];
                 }
@@ -167,10 +220,12 @@ export function useChat(initialMessages: ChatMessage[] = []) {
               } else if (chunk.type === "error") {
                 streamDone = true;
                 flushDisplay();
+                commitSegmentToParts();
+                parts = finalizePartsForSave(parts);
                 setMessages((prev) =>
                   prev.map((m) =>
                     m.id === assistantId
-                      ? { ...m, content: normalize(streamedContent), isStreaming: false, hasError: true }
+                      ? { ...m, content: normalize(streamedContent), parts, isStreaming: false, hasError: true }
                       : m
                   )
                 );
@@ -181,10 +236,14 @@ export function useChat(initialMessages: ChatMessage[] = []) {
         }
 
         flushDisplay();
+        commitSegmentToParts();
         finalContent = normalize(streamedContent);
+        parts = finalizePartsForSave(parts);
 
         setMessages((prev) =>
-          prev.map((m) => m.id === assistantId ? { ...m, content: finalContent, isStreaming: false } : m)
+          prev.map((m) =>
+            m.id === assistantId ? { ...m, content: finalContent, parts, isStreaming: false } : m
+          )
         );
 
         if (payload.session_id && payload.user?.id) {
