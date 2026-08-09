@@ -36,6 +36,8 @@ export interface ToolCall {
   tool: string;
   input: Record<string, unknown>;
   output?: string;
+  /** True when the tool threw or ended with an error payload. */
+  isError?: boolean;
 }
 
 export type MessagePart =
