@@ -1,6 +1,11 @@
 import type { Dashboard } from "@/lib/types";
-import { decryptSecret } from "@/lib/secrets/credentials-crypto";
-import { adminGetDataSourceFullOptional, adminGetSetting } from "@/lib/supabase/admin-queries";
+import {
+  adminDecryptDataSourceCredentials,
+  adminGetDataSourceFullOptional,
+  adminGetDefaultBigQueryDataSourceOptional,
+  adminGetSetting,
+  type DataSourceRow,
+} from "@/lib/supabase/admin-queries";
 import { AnthropicModel, ModelProvider, OPENAI_MODEL_CHOICES } from "../enums/model-names";
 import { resolveLlmApiKeyFromSettings } from "./llm-api-key-from-settings";
 
@@ -13,7 +18,7 @@ export interface ResolvedChatRuntime {
   bigQuery: {
     projectId: string;
     location: string;
-    credentialsJson?: string;
+    credentialsJson: string;
   };
 }
 
@@ -21,6 +26,37 @@ function parseProvider(v: string | null | undefined): ModelProvider {
   const p = (v ?? process.env.MODEL_PROVIDER ?? "anthropic").toLowerCase();
   if (p === "openai") return ModelProvider.OpenAI;
   return ModelProvider.Anthropic;
+}
+
+async function resolveBigQueryFromAdmin(dashboard: Dashboard): Promise<{
+  projectId: string;
+  location: string;
+  credentialsJson: string;
+} | null> {
+  let ds: DataSourceRow | null = null;
+
+  if (dashboard.data_source_id) {
+    ds = await adminGetDataSourceFullOptional(dashboard.data_source_id);
+    if (!ds) {
+      throw new Error(
+        "Dashboard data source could not be loaded. Ensure SUPABASE_SERVICE_ROLE_KEY is set and the source still exists."
+      );
+    }
+    if (ds.type !== "bigquery") {
+      throw new Error(`Dashboard data source "${ds.label}" is not a BigQuery source.`);
+    }
+  } else {
+    // Prefer the admin-connected source over env when the dashboard has none assigned.
+    ds = await adminGetDefaultBigQueryDataSourceOptional();
+  }
+
+  if (!ds) return null;
+
+  return {
+    projectId: ds.project_id,
+    location: ds.location,
+    credentialsJson: adminDecryptDataSourceCredentials(ds),
+  };
 }
 
 export async function resolveChatRuntime(dashboard: Dashboard): Promise<ResolvedChatRuntime> {
@@ -51,23 +87,16 @@ export async function resolveChatRuntime(dashboard: Dashboard): Promise<Resolved
     );
   }
 
-  let projectId = process.env.BIGQUERY_PROJECT ?? "tenms-userdb";
-  let credentialsJson: string | undefined = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
-  let location = process.env.BIGQUERY_LOCATION ?? "US";
+  const fromAdmin = await resolveBigQueryFromAdmin(dashboard);
+  const credentialsJson =
+    fromAdmin?.credentialsJson ?? process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.trim();
+  const projectId = fromAdmin?.projectId ?? process.env.BIGQUERY_PROJECT ?? "tenms-userdb";
+  const location = fromAdmin?.location ?? process.env.BIGQUERY_LOCATION ?? "US";
 
-  if (dashboard.data_source_id) {
-    const ds = await adminGetDataSourceFullOptional(dashboard.data_source_id);
-    if (ds?.type === "bigquery") {
-      projectId = ds.project_id;
-      location = ds.location;
-      if (ds.credentials_encrypted) {
-        try {
-          credentialsJson = decryptSecret(ds.credentials_encrypted);
-        } catch {
-          credentialsJson = undefined;
-        }
-      }
-    }
+  if (!credentialsJson) {
+    throw new Error(
+      "No BigQuery credentials available. Add a Connected source in Admin (or set GOOGLE_APPLICATION_CREDENTIALS_JSON)."
+    );
   }
 
   return {

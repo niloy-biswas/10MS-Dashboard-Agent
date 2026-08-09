@@ -8,8 +8,58 @@ type WireChunk =
   | { type: "begin"; metadata: { nodeName: string } }
   | { type: "item"; content: string }
   | { type: "tool_start"; tool: string; input: Record<string, unknown> }
-  | { type: "tool_end"; tool: string; output: string }
+  | { type: "tool_end"; tool: string; output: string; isError?: boolean }
   | { type: "error" };
+
+function toolOutputToString(raw: unknown): { output: string; isError: boolean } {
+  if (raw == null) return { output: "", isError: false };
+
+  if (typeof raw === "string") {
+    return { output: raw, isError: false };
+  }
+
+  if (typeof raw === "object") {
+    const msg = raw as {
+      content?: unknown;
+      status?: string;
+      message?: string;
+    };
+    const isError = msg.status === "error";
+    if (typeof msg.content === "string") {
+      return { output: msg.content, isError };
+    }
+    if (Array.isArray(msg.content)) {
+      const text = msg.content
+        .map((c) => {
+          if (typeof c === "string") return c;
+          if (c && typeof c === "object" && "text" in c) {
+            return String((c as { text?: unknown }).text ?? "");
+          }
+          return "";
+        })
+        .join("");
+      return { output: text || JSON.stringify(raw), isError };
+    }
+    if (typeof msg.message === "string") {
+      return { output: msg.message, isError: true };
+    }
+  }
+
+  return { output: JSON.stringify(raw), isError: false };
+}
+
+function toolErrorToString(raw: unknown): string {
+  if (raw instanceof Error) return raw.message;
+  if (typeof raw === "string") return raw;
+  if (raw && typeof raw === "object" && "message" in raw) {
+    return String((raw as { message: unknown }).message);
+  }
+  try {
+    return JSON.stringify(raw ?? "Tool failed");
+  } catch {
+    return "Tool failed";
+  }
+}
 
 export async function streamAgentResponse(
   payload: ChatPayload,
@@ -44,9 +94,16 @@ export async function streamAgentResponse(
             emit({ type: "tool_start", tool: toolName, input: (event.data?.input ?? {}) as Record<string, unknown> });
           } else if (event.event === "on_tool_end") {
             const toolName = event.name ?? "unknown";
-            const raw = event.data?.output;
-            const output = typeof raw === "string" ? raw : (raw?.content ?? JSON.stringify(raw ?? ""));
-            emit({ type: "tool_end", tool: toolName, output });
+            const { output, isError } = toolOutputToString(event.data?.output);
+            emit({ type: "tool_end", tool: toolName, output, isError: isError || undefined });
+          } else if (event.event === "on_tool_error") {
+            const toolName = event.name ?? "unknown";
+            emit({
+              type: "tool_end",
+              tool: toolName,
+              output: toolErrorToString(event.data?.error ?? event.data),
+              isError: true,
+            });
           } else if (event.event === "on_chat_model_stream") {
             const raw = event.data?.chunk?.content;
             let token = "";

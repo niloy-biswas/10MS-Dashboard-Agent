@@ -2,28 +2,31 @@ import { tool } from "@langchain/core/tools";
 import { BigQuery } from "@google-cloud/bigquery";
 import { z } from "zod";
 
-function parseCredentials(raw?: string) {
-  if (!raw) return undefined;
+function parseCredentials(raw: string) {
   try {
-    return JSON.parse(raw);
+    return JSON.parse(raw) as Record<string, unknown>;
   } catch {
-    console.error("Invalid BigQuery credentials JSON");
-    return undefined;
+    throw new Error("Invalid BigQuery credentials JSON");
   }
 }
 
 export interface BigQueryRuntimeOptions {
   projectId: string;
   location?: string;
-  credentialsJson?: string;
+  /** Service account JSON string — required; do not fall back to ADC. */
+  credentialsJson: string;
 }
 
 export function createBigQueryTools(options: BigQueryRuntimeOptions) {
   const location = options.location ?? process.env.BIGQUERY_LOCATION ?? "US";
+  const credentialsJson = options.credentialsJson.trim();
+  if (!credentialsJson) {
+    throw new Error("BigQuery credentialsJson is required");
+  }
   const bq = new BigQuery({
     projectId: options.projectId,
     location,
-    credentials: parseCredentials(options.credentialsJson),
+    credentials: parseCredentials(credentialsJson),
   });
 
   const execute_query = tool(

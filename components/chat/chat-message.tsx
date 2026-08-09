@@ -299,6 +299,31 @@ export function ChatMessageBubble({ message, readOnly = false }: ChatMessageProp
     await saveReaction("disliked", text);
   };
 
+  const partsHaveText = Boolean(
+    message.parts?.some((p) => p.type === "text" && p.content.trim().length > 0)
+  );
+  // Older saves stored tool_calls with empty text parts; content column still has the reply.
+  const showContentFallback =
+    Boolean(message.parts?.length) &&
+    !partsHaveText &&
+    !message.isStreaming &&
+    message.content.trim().length > 0;
+
+  const renderParsedContent = (raw: string, keyPrefix = "") =>
+    parseContentParts(raw).map((part, i) =>
+      part.type === "chart" ? (
+        <ChartBlock key={`${keyPrefix}${i}`} spec={part.spec} />
+      ) : (
+        <ReactMarkdown
+          key={`${keyPrefix}${i}`}
+          remarkPlugins={[remarkGfm]}
+          components={MARKDOWN_COMPONENTS}
+        >
+          {part.content}
+        </ReactMarkdown>
+      )
+    );
+
   return (
     <>
       <motion.div
@@ -321,44 +346,34 @@ export function ChatMessageBubble({ message, readOnly = false }: ChatMessageProp
               {message.content.length === 0 && message.isStreaming && !message.parts?.length ? (
                 <ThinkingIndicator state={message.thinkingState === "querying" ? "querying" : "thinking"} />
               ) : message.parts?.length ? (
-                // Interleaved parts: text segments and tool calls in order
                 <div>
                   {message.parts.map((part, i) =>
                     part.type === "tool_call" ? (
-                      <ToolCallBlock key={i} toolCall={part.toolCall} />
+                      <ToolCallBlock
+                        key={i}
+                        toolCall={part.toolCall}
+                        isStreaming={message.isStreaming}
+                      />
                     ) : part.content.length === 0 && message.isStreaming ? (
-                      <ThinkingIndicator key={i} state={message.thinkingState === "querying" ? "querying" : "thinking"} />
-                    ) : (
+                      <ThinkingIndicator
+                        key={i}
+                        state={message.thinkingState === "querying" ? "querying" : "thinking"}
+                      />
+                    ) : part.content.length === 0 ? null : (
                       <div key={i} className="overflow-x-auto">
-                        {parseContentParts(part.content).map((cp, j) =>
-                          cp.type === "chart" ? (
-                            <ChartBlock key={j} spec={cp.spec} />
-                          ) : (
-                            <ReactMarkdown key={j} remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>
-                              {cp.content}
-                            </ReactMarkdown>
-                          )
-                        )}
+                        {renderParsedContent(part.content)}
                       </div>
                     )
                   )}
-                  {/* Thinking indicator after last tool_call while waiting for next text */}
+                  {showContentFallback && (
+                    <div className="overflow-x-auto">{renderParsedContent(message.content, "fallback-")}</div>
+                  )}
                   {message.isStreaming && message.parts[message.parts.length - 1]?.type === "tool_call" && (
                     <ThinkingIndicator state={message.thinkingState === "querying" ? "querying" : "thinking"} />
                   )}
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  {parseContentParts(message.content).map((part, i) =>
-                    part.type === "chart" ? (
-                      <ChartBlock key={i} spec={part.spec} />
-                    ) : (
-                      <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>
-                        {part.content}
-                      </ReactMarkdown>
-                    )
-                  )}
-                </div>
+                <div className="overflow-x-auto">{renderParsedContent(message.content)}</div>
               )}
               {message.hasError && (
                 <div className="flex items-start gap-2 mt-3 px-3 py-2.5 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive text-xs">

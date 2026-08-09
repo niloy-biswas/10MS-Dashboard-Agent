@@ -351,7 +351,7 @@ export function DashboardEditor({
                 onChange={(e) => updateField("data_source_id", e.target.value)}
                 className="w-full h-10 px-3 rounded-lg bg-input border border-border text-sm"
               >
-                <option value="">Use env fallback / unassigned</option>
+                <option value="">Default connected source (or env)</option>
                 {dataSources.map((source) => (
                   <option key={source.id} value={source.id}>
                     {source.label} ({source.project_id}, {source.location})
