@@ -35,6 +35,23 @@ export async function adminGetDataSourceFullOptional(id: string): Promise<DataSo
   return data as DataSourceRow | null;
 }
 
+/**
+ * Chat fallback when a dashboard has no data_source_id: most recently updated BigQuery
+ * source from Admin → Connected sources.
+ */
+export async function adminGetDefaultBigQueryDataSourceOptional(): Promise<DataSourceRow | null> {
+  const admin = tryCreateAdminClient();
+  if (!admin) return null;
+  const { data, error } = await admin
+    .from("data_sources")
+    .select("*")
+    .eq("type", "bigquery")
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  if (error) return null;
+  return (data?.[0] as DataSourceRow | undefined) ?? null;
+}
+
 export async function adminUpsertSetting(key: string, value: string): Promise<void> {
   const admin = createAdminClient();
   const { error } = await admin.from("app_settings").upsert(
@@ -61,6 +78,22 @@ export async function adminGetDataSourceFull(id: string): Promise<DataSourceRow 
   return data as DataSourceRow | null;
 }
 
+/** Decrypt stored service-account JSON for a loaded data source row. */
+export function adminDecryptDataSourceCredentials(ds: DataSourceRow): string {
+  if (!ds.credentials_encrypted) {
+    throw new Error(
+      `Data source "${ds.label}" has no stored credentials. Re-save the service account JSON in Admin → Connected sources.`
+    );
+  }
+  try {
+    return decryptSecret(ds.credentials_encrypted);
+  } catch {
+    throw new Error(
+      `Could not decrypt credentials for data source "${ds.label}". Check SETTINGS_ENCRYPTION_KEY matches the key used when the source was saved.`
+    );
+  }
+}
+
 /** Prefer pasted JSON; otherwise decrypt stored credentials for the data source. */
 export async function adminResolveDataSourceCredentials(
   id: string,
@@ -69,12 +102,10 @@ export async function adminResolveDataSourceCredentials(
   const trimmed = credentialsJson?.trim();
   if (trimmed) return trimmed;
   const existing = await adminGetDataSourceFull(id);
-  if (!existing?.credentials_encrypted) {
-    throw new Error(
-      "No stored credentials found. Paste service account JSON before continuing."
-    );
+  if (!existing) {
+    throw new Error("Data source not found.");
   }
-  return decryptSecret(existing.credentials_encrypted);
+  return adminDecryptDataSourceCredentials(existing);
 }
 
 export async function adminInsertBigQueryDataSource(params: {
